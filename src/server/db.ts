@@ -4,7 +4,6 @@
  */
 import { env } from "@/server/env";
 import { PrismaClient } from "@prisma/client";
-export * from "@prisma/client";
 
 const prismaGlobal = globalThis as typeof globalThis & {
   prisma?: PrismaClient;

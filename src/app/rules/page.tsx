@@ -1,8 +1,8 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import RulesDashboard from "../_components/rules/RulesDashboard";
-import { Suspense } from "react";
-import { RuleCardSkeleton } from "../_components/rules/RuleCardSkeleton";
+import RulesDashboard from "@/app/_components/rules/RulesDashboard";
+import { RuleCardSkeleton } from "@/app/_components/rules/RuleCardSkeleton";
 
 export default async function RulesPage() {
   return (

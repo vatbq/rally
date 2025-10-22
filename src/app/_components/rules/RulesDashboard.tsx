@@ -1,6 +1,6 @@
 import { getRulesAction } from "@/app/_actions/rules";
 import { RuleCard } from "@/app/_components/rules/RuleCard";
-import { Rule } from "@/server/db";
+import { type Rule } from "@prisma/client";
 
 const RulesDashboard = async () => {
   const rules = await getRulesAction();

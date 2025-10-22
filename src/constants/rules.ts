@@ -1,4 +1,4 @@
-import { ServiceType } from "@/server/db";
+import { ServiceType } from "@prisma/client";
 
 export const SERVICE_TYPE_LABELS: Record<ServiceType, string> = {
   [ServiceType.ROUTINE_MAINTENANCE]: "Routine Maintenance",

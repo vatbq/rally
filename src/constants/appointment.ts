@@ -1,4 +1,4 @@
-import { AppointmentStatus } from "@/server/db";
+import { AppointmentStatus } from "@prisma/client";
 
 export const APPOINTMENT_STATUS_LABELS: Record<AppointmentStatus, string> = {
   [AppointmentStatus.BOOKED]: "Booked",

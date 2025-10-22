@@ -1,4 +1,6 @@
-import { AppointmentStatus, db, type Rule } from "@/server/db";
+import { CreateRule } from "@/schemas/rules";
+import { db } from "@/server/db";
+import { type Rule, AppointmentStatus } from "@prisma/client";
 import { Cohort } from "@/server/interfaces/rules";
 
 export const getRules = async () : Promise<Rule[]> => {
@@ -9,8 +11,8 @@ export const getRule = async (id: string) => {
   return await db.rule.findUnique({ where: { id } });
 };
 
-export const createRule = async (rule: Rule) => {
-  return await db.rule.create({ data: rule });
+export const createRule = async (data: CreateRule) => {
+  return await db.rule.create({ data });
 };
 
 export const previewRuleCohort = async (ruleId: string): Promise<Cohort> => {

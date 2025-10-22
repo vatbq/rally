@@ -1,4 +1,4 @@
-import { Rule } from "@/server/db";
+import { type Rule } from "@prisma/client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { SERVICE_TYPE_LABELS } from "@/constants/rules";
 import { CohortPreviewDialog } from "./CohortPreviewDialog";

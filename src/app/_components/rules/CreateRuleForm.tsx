@@ -25,7 +25,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { SERVICE_TYPE_LABELS, TIMEZONES } from "@/constants/rules";
 import { createRuleAction } from "@/app/_actions/rules";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { CreateRule, createRuleSchema } from "@/schemas/rules";
 
 export default function CreateRuleForm() {
@@ -43,7 +49,7 @@ export default function CreateRuleForm() {
       timezone: "",
       emailTemplate: "",
       enabled: false,
-    }
+    },
   });
 
   async function onSubmit(data: CreateRule) {
@@ -63,7 +69,8 @@ export default function CreateRuleForm() {
       <CardHeader>
         <CardTitle>Create Re-engagement Rule</CardTitle>
         <CardDescription>
-          Define a rule to automatically re-engage customers based on their service history.
+          Define a rule to automatically re-engage customers based on their
+          service history.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -82,7 +89,10 @@ export default function CreateRuleForm() {
                 <FormItem>
                   <FormLabel>Rule Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., 6-Month Maintenance Reminder" {...field} />
+                    <Input
+                      placeholder="e.g., 6-Month Maintenance Reminder"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
                     A descriptive name for this rule
@@ -98,18 +108,23 @@ export default function CreateRuleForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Service Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a service type" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {Object.entries(SERVICE_TYPE_LABELS).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
-                        </SelectItem>
-                      ))}
+                      {Object.entries(SERVICE_TYPE_LABELS).map(
+                        ([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        ),
+                      )}
                     </SelectContent>
                   </Select>
                   <FormDescription>
@@ -127,11 +142,15 @@ export default function CreateRuleForm() {
                 <FormItem>
                   <FormLabel>Cadence (Months)</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
+                    <Input
+                      type="number"
                       min="1"
                       {...field}
-                      onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : "")}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value ? Number(e.target.value) : "",
+                        )
+                      }
                     />
                   </FormControl>
                   <FormDescription>
@@ -150,11 +169,15 @@ export default function CreateRuleForm() {
                   <FormItem>
                     <FormLabel>Send Window (Days)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
+                      <Input
+                        type="number"
                         min="0"
                         {...field}
-                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : "")}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value ? Number(e.target.value) : "",
+                          )
+                        }
                       />
                     </FormControl>
                     <FormDescription>
@@ -172,12 +195,16 @@ export default function CreateRuleForm() {
                   <FormItem>
                     <FormLabel>Send Time (Hour)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        min="0" 
+                      <Input
+                        type="number"
+                        min="0"
                         max="23"
                         {...field}
-                        onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : "")}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value ? Number(e.target.value) : "",
+                          )
+                        }
                       />
                     </FormControl>
                     <FormDescription>
@@ -195,7 +222,10 @@ export default function CreateRuleForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Timezone</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a timezone" />
@@ -224,7 +254,7 @@ export default function CreateRuleForm() {
                 <FormItem>
                   <FormLabel>Email Template</FormLabel>
                   <FormControl>
-                    <Textarea 
+                    <Textarea
                       rows={10}
                       placeholder="Enter your email template..."
                       className="font-mono text-sm"
@@ -232,7 +262,9 @@ export default function CreateRuleForm() {
                     />
                   </FormControl>
                   <FormDescription>
-                    Available variables: {"{firstName}"}, {"{lastName}"}, {"{vehicleMake}"}, {"{vehicleModel}"}, {"{serviceType}"}, {"{monthsSinceLastService}"}
+                    Available variables: {"{firstName}"}, {"{lastName}"},{" "}
+                    {"{vehicleMake}"}, {"{vehicleModel}"}, {"{serviceType}"},{" "}
+                    {"{monthsSinceLastService}"}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -251,9 +283,7 @@ export default function CreateRuleForm() {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>
-                      Enable this rule
-                    </FormLabel>
+                    <FormLabel>Enable this rule</FormLabel>
                     <FormDescription>
                       When enabled, this rule will run automatically on schedule
                     </FormDescription>
@@ -281,4 +311,3 @@ export default function CreateRuleForm() {
     </Card>
   );
 }
-

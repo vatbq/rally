@@ -2,13 +2,14 @@ import { type Rule } from "@prisma/client";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { SERVICE_TYPE_LABELS } from "@/constants/rules";
 import { CohortPreviewDialog } from "./CohortPreviewDialog";
+import { SendCampaignDialog } from "./SendCampaignDialog";
 import { previewRuleCohortAction } from "@/app/_actions/rules";
 
 interface RuleCardProps {
   rule: Rule;
 }
 
-export const RuleCard = ({ rule }: RuleCardProps) => {  
+export const RuleCard = ({ rule }: RuleCardProps) => {
   const cohort = previewRuleCohortAction(rule.id);
 
   return (
@@ -56,7 +57,16 @@ export const RuleCard = ({ rule }: RuleCardProps) => {
           </div>
         </div>
 
-        <CohortPreviewDialog ruleName={rule.name} cohort={cohort} />
+        <div className="space-y-2">
+          <CohortPreviewDialog ruleName={rule.name} cohort={cohort} />
+          {rule.enabled && (
+            <SendCampaignDialog
+              ruleId={rule.id}
+              ruleName={rule.name}
+              cohort={cohort}
+            />
+          )}
+        </div>
       </CardContent>
     </Card>
   );

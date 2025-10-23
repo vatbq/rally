@@ -25,6 +25,13 @@ enum AppointmentStatus {
   COMPLETED
 }
 
+enum EmailStatus {
+  QUEUED      
+  SENT        
+  DELIVERED   
+  FAILED     
+}
+
 model Customer {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -116,6 +123,7 @@ model Email {
   queuedAt    DateTime  @default(now())
   sentAt      DateTime?
   deliveredAt DateTime?
+  status      EmailStatus  @default(QUEUED)
 
   run      RuleRun? @relation(fields: [runId], references: [id], onDelete: SetNull)
   rule     Rule?    @relation(fields: [ruleId], references: [id], onDelete: SetNull)

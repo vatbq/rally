@@ -18,7 +18,9 @@ interface CohortPreviewDialogProps {
   cohort: Promise<Cohort>;
 }
 
-const CohortContent = ({ cohort }: Pick<CohortPreviewDialogProps, "cohort">) => {
+const CohortContent = ({
+  cohort,
+}: Pick<CohortPreviewDialogProps, "cohort">) => {
   const data = use(cohort);
 
   if (data.length === 0) {
@@ -45,7 +47,9 @@ const CohortContent = ({ cohort }: Pick<CohortPreviewDialogProps, "cohort">) => 
           >
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <p className="font-medium">{member.customer.firstName} {member.customer.lastName}</p>
+                <p className="font-medium">
+                  {member.customer.firstName} {member.customer.lastName}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   {member.customer.email}
                 </p>
@@ -60,10 +64,17 @@ const CohortContent = ({ cohort }: Pick<CohortPreviewDialogProps, "cohort">) => 
                       Last service
                     </p>
                     <p className="text-sm font-medium">
-                      {new Date(member.lastService.performedAt).toLocaleDateString()}
+                      {new Date(
+                        member.lastService.performedAt,
+                      ).toLocaleDateString()}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {Math.floor((new Date().getTime() - member.lastService.performedAt.getTime()) / (1000 * 60 * 60 * 24))} days ago
+                      {Math.floor(
+                        (new Date().getTime() -
+                          member.lastService.performedAt.getTime()) /
+                          (1000 * 60 * 60 * 24),
+                      )}{" "}
+                      days ago
                     </p>
                   </>
                 ) : (
@@ -78,7 +89,7 @@ const CohortContent = ({ cohort }: Pick<CohortPreviewDialogProps, "cohort">) => 
       </div>
     </div>
   );
-}
+};
 
 export const CohortPreviewDialog = ({
   ruleName,
@@ -101,7 +112,8 @@ export const CohortPreviewDialog = ({
             Cohort Preview: {ruleName}
           </DialogTitle>
           <DialogDescription>
-            Customers and vehicles currently eligible for this re-engagement rule
+            Customers and vehicles currently eligible for this re-engagement
+            rule
           </DialogDescription>
         </DialogHeader>
 

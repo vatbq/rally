@@ -1,0 +1,75 @@
+import { parentPort, workerData } from "worker_threads";
+import { db } from "@/server/db";
+import { EmailStatus } from "@prisma/client";
+
+interface WorkerData {
+  runId: string;
+}
+
+const processEmails = async (runId: string) => {
+  const emailsToProcess = await db.email.findMany({
+    where: {
+      runId: runId,
+    },
+    orderBy: {
+      queuedAt: "asc",
+    },
+  });
+
+  // Mark them as "sent"
+  for (const email of emailsToProcess) {
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Small delay to simulate processing
+    await db.email.update({
+      where: { id: email.id },
+      data: { status: EmailStatus.SENT, sentAt: new Date() },
+    });
+  }
+
+  // Mark them as "delivered"
+  for (const email of emailsToProcess) {
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Small delay to simulate delivery
+
+    await db.email.update({
+      where: { id: email.id },
+      data: { status: EmailStatus.DELIVERED, deliveredAt: new Date() },
+    });
+  }
+
+  // mark run as completed
+  await db.ruleRun.update({
+    where: { id: runId },
+    data: { completedAt: new Date() },
+  });
+
+  return {
+    success: true,
+    result: {
+      processed: emailsToProcess.length,
+      runId,
+    },
+  };
+};
+
+(async () => {
+  try {
+    const { runId } = workerData as WorkerData;
+    const result = await processEmails(runId);
+
+    if (parentPort) {
+      parentPort.postMessage({ success: true, result });
+    }
+  } catch (error) {
+    console.error(
+      "\x1b[31m%s\x1b[0m",
+      "[Worker] Error processing emails:",
+      error,
+    );
+    if (parentPort) {
+      parentPort.postMessage({
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+    process.exit(1);
+  }
+})();

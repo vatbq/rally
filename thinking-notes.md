@@ -59,3 +59,12 @@
   - En emails guardo `customerId` + `vehicleId` para que **conversations/dashboard** puedan resolverse sin joins pesados.
 
 All schema versions considered in [database diagram](./docs/rally.database.png).
+
+---
+
+email simulation
+why use workers?
+use workers for emails so we don't block the main thread and simulates the sending of the email realictisc
+add time between updates to simulates time
+
+i first get all campaings and then only pulling for the ones that are not completed. hago pulling ahora por la simulacion, pero usaria https://resend.com/.

@@ -162,11 +162,11 @@ async function main() {
       sendWindowHours: 0,
       timezone: "America/Los_Angeles",
       enabled: true,
-      emailTemplate: `Hi {{firstName}},
+      emailTemplate: `Hi {firstName},
 
-It's time for your {{year}} {{make}} {{model}}'s oil change! 
+It's time for your {year} {make} {model}'s oil change! 
 
-Your last oil change was {{lastServiceDate}}, and we recommend getting one every {{cadenceMonths}} months.
+Your last oil change was {lastServiceDate}, and we recommend getting one every {cadenceMonths} months.
 
 Schedule your appointment today!
 
@@ -184,9 +184,9 @@ Rally Auto Service`,
       sendWindowHours: 0,
       timezone: "America/Los_Angeles",
       enabled: true,
-      emailTemplate: `Hi {{firstName}},
+      emailTemplate: `Hi {firstName},
 
-It's been {{cadenceMonths}} months since your last tire rotation for your {{year}} {{make}} {{model}}.
+It's been {cadenceMonths} months since your last tire rotation for your {year} {make} {model}.
 
 Regular tire rotations help extend tire life and ensure even wear.
 
@@ -206,11 +206,11 @@ Rally Auto Service`,
       sendWindowHours: 0,
       timezone: "America/Los_Angeles",
       enabled: true,
-      emailTemplate: `Hi {{firstName}},
+      emailTemplate: `Hi {firstName},
 
-Safety first! It's time for your annual brake inspection for your {{year}} {{make}} {{model}}.
+Safety first! It's time for your annual brake inspection for your {year} {make} {model}.
 
-Your last inspection was {{lastServiceDate}}.
+Your last inspection was {lastServiceDate}.
 
 Schedule your brake inspection today!
 
@@ -268,49 +268,6 @@ Rally Auto Service`,
   });
 
   console.log("✅ Created appointments");
-
-  // Create a rule run and emails
-  const ruleRun = await db.ruleRun.create({
-    data: {
-      ruleId: oilChangeRule.id,
-      startedAt: new Date(),
-      completedAt: new Date(),
-    },
-  });
-
-  await db.ruleTarget.create({
-    data: {
-      runId: ruleRun.id,
-      ruleId: oilChangeRule.id,
-      vehicleId: vehicle1.id,
-    },
-  });
-
-  await db.email.create({
-    data: {
-      runId: ruleRun.id,
-      ruleId: oilChangeRule.id,
-      customerId: customer1.id,
-      vehicleId: vehicle1.id,
-      toAddress: customer1.email,
-      subject: "Time for Your Oil Change - 2019 Honda Accord",
-      body: `Hi John,
-
-It's time for your 2019 Honda Accord's oil change! 
-
-Your last oil change was 3 months ago, and we recommend getting one every 3 months.
-
-Schedule your appointment today!
-
-Best regards,
-Rally Auto Service`,
-      queuedAt: new Date(),
-      sentAt: new Date(),
-      deliveredAt: new Date(),
-    },
-  });
-
-  console.log("✅ Created rule run and emails");
 
   console.log("🎉 Seeding completed successfully!");
 }

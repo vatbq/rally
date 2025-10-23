@@ -22,7 +22,7 @@ export const campaignFormSchema = z
     {
       message: "Please select both date and time",
       path: ["scheduledDate"],
-    }
+    },
   )
   .refine(
     (data) => {
@@ -32,7 +32,7 @@ export const campaignFormSchema = z
         data.scheduledTime
       ) {
         const scheduledFor = new Date(
-          `${data.scheduledDate}T${data.scheduledTime}`
+          `${data.scheduledDate}T${data.scheduledTime}`,
         );
         return scheduledFor > new Date();
       }
@@ -41,7 +41,7 @@ export const campaignFormSchema = z
     {
       message: "Scheduled time must be in the future",
       path: ["scheduledTime"],
-    }
+    },
   );
 
 export type CampaignFormData = z.infer<typeof campaignFormSchema>;

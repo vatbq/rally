@@ -263,8 +263,8 @@ export default function CreateRuleForm() {
                   </FormControl>
                   <FormDescription>
                     Available variables: {"{firstName}"}, {"{lastName}"},{" "}
-                    {"{vehicleMake}"}, {"{vehicleModel}"}, {"{serviceType}"},{" "}
-                    {"{monthsSinceLastService}"}
+                    {"{vehicle}"}, {"{year}"}, {"{make}"}, {"{model}"},{" "}
+                    {"{service}"}, {"{cadenceMonths}"}, {"{lastServiceDate}"}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

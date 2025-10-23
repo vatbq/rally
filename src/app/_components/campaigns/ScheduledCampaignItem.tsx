@@ -36,7 +36,7 @@ export function ScheduledCampaignItem({
           </span>
         </div>
       </div>
-     <CancelScheduledCampaignButton campaignId={campaign.id} />
+      <CancelScheduledCampaignButton campaignId={campaign.id} />
     </div>
   );
 }

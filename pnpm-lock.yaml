@@ -46,6 +46,9 @@ importers:
       node-cron:
         specifier: ^4.2.1
         version: 4.2.1
+      openai:
+        specifier: ^6.6.0
+        version: 6.6.0(zod@4.1.12)
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -3509,6 +3512,21 @@ packages:
         integrity: sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ==,
       }
 
+  openai@6.6.0:
+    resolution:
+      {
+        integrity: sha512-1yWk4cBsHF5Bq9TreHYOHY7pbqdlT74COnm8vPx7WKn36StS+Hyk8DdAitnLaw67a5Cudkz5EmlFQjSrNnrA2w==,
+      }
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
   optionator@0.9.4:
     resolution:
       {
@@ -6449,6 +6467,10 @@ snapshots:
       es-object-atoms: 1.1.1
 
   ohash@2.0.11: {}
+
+  openai@6.6.0(zod@4.1.12):
+    optionalDependencies:
+      zod: 4.1.12
 
   optionator@0.9.4:
     dependencies:

@@ -1,6 +1,6 @@
 import { parentPort, workerData } from "worker_threads";
 import { db } from "@/server/db";
-import { EmailStatus, ScheduledCampaignStatus } from "@prisma/client";
+import { EmailStatus } from "@prisma/client";
 
 interface WorkerData {
   scheduledCampaignId: string;
@@ -39,11 +39,6 @@ const processEmails = async (scheduledCampaignId: string) => {
   await db.ruleRun.update({
     where: { id: scheduledCampaignId },
     data: { completedAt: new Date() },
-  });
-
-  await db.scheduledCampaign.update({
-    where: { executedRunId: scheduledCampaignId },
-    data: { status: ScheduledCampaignStatus.COMPLETED },
   });
 
   return {

@@ -15,6 +15,7 @@ import {
   Car,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getCampaignAction } from "@/app/_actions/campaigns";
 
 type Campaign = NonNullable<Awaited<ReturnType<typeof getCampaignAction>>>;
@@ -29,6 +30,7 @@ export function CampaignDetail({
   campaignId,
 }: CampaignDetailProps) {
   const [campaign, setCampaign] = useState(initialCampaign);
+  const router = useRouter();
 
   useEffect(() => {
     if (campaign.completedAt) {
@@ -49,9 +51,27 @@ export function CampaignDetail({
     return () => clearInterval(interval);
   }, [campaignId, campaign.completedAt]);
 
-  const queuedEmails = campaign.emails.filter((e) => !e.sentAt);
-  const sentEmails = campaign.emails.filter((e) => e.sentAt && !e.deliveredAt);
-  const deliveredEmails = campaign.emails.filter((e) => e.deliveredAt);
+  // Group emails by threadId and only show the first email from each thread
+  const emailThreads = new Map<string, typeof campaign.emails>();
+  campaign.emails.forEach((email) => {
+    const tid = email.threadId || email.id;
+    if (!emailThreads.has(tid)) {
+      emailThreads.set(tid, []);
+    }
+    emailThreads.get(tid)!.push(email);
+  });
+
+  // Get first email from each thread for display
+  const threadPreviews = Array.from(emailThreads.values()).map((thread) => {
+    const sortedThread = thread.sort(
+      (a, b) => new Date(a.queuedAt).getTime() - new Date(b.queuedAt).getTime(),
+    );
+    return sortedThread[0]!;
+  });
+
+  const queuedEmails = threadPreviews.filter((e) => !e.sentAt);
+  const sentEmails = threadPreviews.filter((e) => e.sentAt && !e.deliveredAt);
+  const deliveredEmails = threadPreviews.filter((e) => e.deliveredAt);
 
   const getEmailStatus = (email: (typeof campaign.emails)[0]) => {
     if (email.deliveredAt) {
@@ -79,7 +99,7 @@ export function CampaignDetail({
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
       <div className="mb-6">
         <Link href="/campaigns">
           <Button variant="ghost" size="sm" className="mb-4">
@@ -119,8 +139,8 @@ export function CampaignDetail({
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Total Emails</p>
-                <p className="text-3xl font-bold">{campaign.emails.length}</p>
+                <p className="text-sm text-muted-foreground">Conversations</p>
+                <p className="text-3xl font-bold">{threadPreviews.length}</p>
               </div>
               <Mail className="h-8 w-8 text-muted-foreground" />
             </div>
@@ -173,24 +193,28 @@ export function CampaignDetail({
       {/* Email List */}
       <Card>
         <CardHeader>
-          <CardTitle>Emails</CardTitle>
+          <CardTitle>Conversations</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {campaign.emails.map((email) => {
+            {threadPreviews.map((email) => {
               const status = getEmailStatus(email);
               const StatusIcon = status.icon;
+              const threadId = email.threadId || email.id;
+              const threadEmails = emailThreads.get(threadId) || [];
+              const replyCount = threadEmails.length - 1;
 
               return (
                 <div
                   key={email.id}
-                  className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
+                  onClick={() => router.push(`/conversations/${threadId}`)}
+                  className="border rounded-lg p-4 hover:bg-muted/50 transition-colors cursor-pointer"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center gap-3">
                         <User className="h-4 w-4 text-muted-foreground" />
-                        <div>
+                        <div className="flex-1">
                           <p className="font-medium">
                             {email.customer.firstName} {email.customer.lastName}
                           </p>
@@ -198,6 +222,12 @@ export function CampaignDetail({
                             {email.toAddress}
                           </p>
                         </div>
+                        {replyCount > 0 && (
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                            {replyCount}{" "}
+                            {replyCount === 1 ? "reply" : "replies"}
+                          </span>
+                        )}
                       </div>
 
                       {email.vehicle && (
@@ -247,6 +277,6 @@ export function CampaignDetail({
           </div>
         </CardContent>
       </Card>
-    </div>
+    </>
   );
 }

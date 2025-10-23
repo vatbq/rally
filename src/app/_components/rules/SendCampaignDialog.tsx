@@ -36,7 +36,11 @@ import {
   scheduleEmailCampaignAction,
 } from "@/app/_actions/campaigns";
 import { Cohort } from "@/server/interfaces/rules";
-import { CampaignFormData, campaignFormSchema, Mode } from "@/schemas/campaigns";
+import {
+  CampaignFormData,
+  campaignFormSchema,
+  Mode,
+} from "@/schemas/campaigns";
 
 interface SendCampaignDialogProps {
   ruleId: string;
@@ -158,7 +162,10 @@ export const SendCampaignDialog = ({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 py-4"
+          >
             {open && (
               <Suspense
                 fallback={
@@ -258,7 +265,8 @@ export const SendCampaignDialog = ({
                     : "Schedule emails to be sent at the specified time"}
                 </li>
                 <li>
-                  Automatically progress through queued → sent → delivered states
+                  Automatically progress through queued → sent → delivered
+                  states
                 </li>
                 <li>Track responses and engagement</li>
               </ul>

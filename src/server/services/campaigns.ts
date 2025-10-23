@@ -114,17 +114,26 @@ export const executeEmailCampaign = async (ruleId: string) => {
       })),
     });
 
-    await tx.email.createMany({
-      data: cohort.map((member) => ({
-        runId: run.id,
-        ruleId: ruleId,
-        customerId: member.customer.id,
-        vehicleId: member.vehicleId,
-        toAddress: member.customer.email,
-        subject: generateEmailSubject(rule, member),
-        body: generateEmailBody(rule, member),
-      })),
-    });
+    // Create emails with threadId set to their own id (initial emails start threads)
+    for (const member of cohort) {
+      const email = await tx.email.create({
+        data: {
+          runId: run.id,
+          ruleId: ruleId,
+          customerId: member.customer.id,
+          vehicleId: member.vehicleId,
+          toAddress: member.customer.email,
+          subject: generateEmailSubject(rule, member),
+          body: generateEmailBody(rule, member),
+        },
+      });
+
+      // Set threadId to the email's own id (this email starts the thread)
+      await tx.email.update({
+        where: { id: email.id },
+        data: { threadId: email.id },
+      });
+    }
   });
 
   if (runId) {
@@ -168,9 +177,7 @@ export const getScheduledCampaigns = async () => {
   return await db.scheduledCampaign.findMany({
     where: {
       status: {
-        in: [
-          ScheduledCampaignStatus.PENDING
-        ],
+        in: [ScheduledCampaignStatus.PENDING],
       },
     },
     include: {
@@ -219,7 +226,7 @@ export const executeScheduledCampaign = async (scheduledCampaignId: string) => {
           executedAt: new Date(),
         },
       });
-            
+
       return null;
     }
 
@@ -242,17 +249,26 @@ export const executeScheduledCampaign = async (scheduledCampaignId: string) => {
         })),
       });
 
-      await tx.email.createMany({
-        data: cohort.map((member) => ({
-          runId: run.id,
-          ruleId: scheduled.ruleId,
-          customerId: member.customer.id,
-          vehicleId: member.vehicleId,
-          toAddress: member.customer.email,
-          subject: generateEmailSubject(scheduled.rule, member),
-          body: generateEmailBody(scheduled.rule, member),
-        })),
-      });
+      // Create emails with threadId set to their own id (initial emails start threads)
+      for (const member of cohort) {
+        const email = await tx.email.create({
+          data: {
+            runId: run.id,
+            ruleId: scheduled.ruleId,
+            customerId: member.customer.id,
+            vehicleId: member.vehicleId,
+            toAddress: member.customer.email,
+            subject: generateEmailSubject(scheduled.rule, member),
+            body: generateEmailBody(scheduled.rule, member),
+          },
+        });
+
+        // Set threadId to the email's own id (this email starts the thread)
+        await tx.email.update({
+          where: { id: email.id },
+          data: { threadId: email.id },
+        });
+      }
     });
 
     // Mark as completed after successful creation

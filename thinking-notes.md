@@ -72,3 +72,6 @@ i first get all campaings and then only pulling for the ones that are not comple
 --- for scheduler, i'm just goint to build it here native so I don't use a external service, that implies checking once by minute if there are schedulers to run.
 
 TODO: remove worker, overkill !
+
+--- emails
+adding thread so I can group them by campaign. is Reply so I can show them as conversation in the UI, quick way to do it.

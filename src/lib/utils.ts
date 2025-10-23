@@ -8,13 +8,18 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const generateEmailSubject = (rule: Rule, member: Cohort[0]): string => {
-  const customerName = member.customer.firstName || "Customer";
   return `Time for ${rule.service.toLowerCase().replace(/_/g, " ")} - ${member.make} ${member.model}`;
 };
 
 export const generateEmailBody = (rule: Rule, member: Cohort[0]): string => {
   const customerName = member.customer.firstName || "Customer";
-  const vehicleInfo = `${member.make} ${member.model} ${member.year}`;
+  const lastServiceDate = member.lastService.performedAt
+    ? new Date(member.lastService.performedAt).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "recently";
 
   // Use template if provided, otherwise use default
   if (rule.emailTemplate && rule.emailTemplate.trim() !== "") {
@@ -22,21 +27,25 @@ export const generateEmailBody = (rule: Rule, member: Cohort[0]): string => {
       .replace(/\{customerName\}/g, customerName)
       .replace(/\{firstName\}/g, member.customer.firstName || "Customer")
       .replace(/\{lastName\}/g, member.customer.lastName || "")
-      .replace(/\{vehicle\}/g, vehicleInfo)
-      .replace(/\{service\}/g, rule.service.toLowerCase().replace(/_/g, " "));
+      .replace(/\{year\}/g, String(member.year || ""))
+      .replace(/\{make\}/g, member.make || "")
+      .replace(/\{model\}/g, member.model || "")
+      .replace(/\{service\}/g, rule.service.toLowerCase().replace(/_/g, " "))
+      .replace(/\{cadenceMonths\}/g, String(rule.cadenceMonths))
+      .replace(/\{lastServiceDate\}/g, lastServiceDate);
   }
 
-  // Default template
+  // Default mail
   return `Hi ${customerName},
 
-We noticed it's been ${rule.cadenceMonths} months since your last ${rule.service.toLowerCase().replace(/_/g, " ")} service for your ${vehicleInfo}.
+We noticed it's been ${rule.cadenceMonths} months since your last ${rule.service.toLowerCase().replace(/_/g, " ")} service for your ${member.make} ${member.model} ${member.year}.
 
 It's time to schedule your next service appointment to keep your vehicle running smoothly and safely.
 
 Reply to this email to schedule an appointment, or call us at your convenience.
 
 Best regards,
-Your Service Team`;
+Rally`;
 };
 
 export const formatDate = (date: Date) => {

@@ -141,19 +141,24 @@ model Email {
   runId       String?
   ruleId      String?
   customerId  String
-  vehicleId   String?
+  vehicleId   String
   toAddress   String
   subject     String
   body        String
+  threadId    String?   
+  isReply     Boolean   @default(false)
   queuedAt    DateTime  @default(now())
   sentAt      DateTime?
   deliveredAt DateTime?
   status      EmailStatus  @default(QUEUED)
 
-  run      RuleRun? @relation(fields: [runId], references: [id], onDelete: SetNull)
-  rule     Rule?    @relation(fields: [ruleId], references: [id], onDelete: SetNull)
-  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  vehicle  Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  run          RuleRun?      @relation(fields: [runId], references: [id], onDelete: SetNull)
+  rule         Rule?         @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+  customer     Customer      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  vehicle      Vehicle       @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  appointments Appointment[] // Appointments created from this email thread
+
+  @@index([threadId])
 }
 
 model Appointment {
@@ -164,7 +169,11 @@ model Appointment {
   endsAt    DateTime?
   status    AppointmentStatus @default(BOOKED)
   notes     String?
+  threadId  String?           // Reference to the email that started the conversation thread
   createdAt DateTime          @default(now())
 
   vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  email   Email?  @relation(fields: [threadId], references: [id], onDelete: SetNull)
+
+  @@index([threadId])
 }

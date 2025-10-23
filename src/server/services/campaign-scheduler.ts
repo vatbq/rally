@@ -48,10 +48,13 @@ export const startCampaignScheduler = () => {
             `[Scheduler] Executing scheduled campaign ${schedule.id} for rule "${schedule.rule.name}"`,
           );
 
-         await executeScheduledCampaign(schedule.id);
+          await executeScheduledCampaign(schedule.id);
 
-         console.log("\x1b[32m%s\x1b[0m", "Scheduled campaign executed", schedule.id);
-
+          console.log(
+            "\x1b[32m%s\x1b[0m",
+            "Scheduled campaign executed",
+            schedule.id,
+          );
         } catch (error) {
           console.error(
             "\x1b[31m%s\x1b[0m",

@@ -1,9 +1,7 @@
 "use client";
 
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  CheckCircle,
-} from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { SERVICE_TYPE_LABELS } from "@/constants/rules";
 import { type Campaign } from "@/server/interfaces/campaigns";
 
@@ -43,9 +41,9 @@ const CampaignCard = ({ campaign }: CampaignCardProps) => {
             <p className="text-xs text-muted-foreground">Started</p>
             <p className="text-xs font-medium">
               {new Date(campaign.startedAt).toLocaleDateString()} at{" "}
-              {new Date(campaign.startedAt).toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+              {new Date(campaign.startedAt).toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
               })}
             </p>
           </div>
@@ -54,9 +52,9 @@ const CampaignCard = ({ campaign }: CampaignCardProps) => {
               <p className="text-xs text-muted-foreground">Completed</p>
               <p className="text-xs font-medium">
                 {new Date(campaign.completedAt).toLocaleDateString()} at{" "}
-                {new Date(campaign.completedAt).toLocaleTimeString([], { 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
+                {new Date(campaign.completedAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
               </p>
             </div>

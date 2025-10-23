@@ -69,4 +69,6 @@ add time between updates to simulates time
 
 i first get all campaings and then only pulling for the ones that are not completed. hago pulling ahora por la simulacion, pero usaria https://resend.com/.
 
---- for scheduler, i'm just goint to build it here native so I don't use a external service, that implies checking once by minute if there are schedulers to run. 
+--- for scheduler, i'm just goint to build it here native so I don't use a external service, that implies checking once by minute if there are schedulers to run.
+
+TODO: remove worker, overkill !

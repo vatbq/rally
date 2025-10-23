@@ -1,10 +1,15 @@
-import { getCampaignsAction } from "@/app/_actions/campaigns";
+import {
+  getCampaignsAction,
+  getScheduledCampaignsAction,
+} from "@/app/_actions/campaigns";
 import { CampaignsDashboard } from "@/app/_components/campaigns/CampaignsDashboard";
+import { ScheduledCampaignsSection } from "@/app/_components/campaigns/ScheduledCampaignsSection";
 import { Suspense } from "react";
 import CampaignCardSkeleton from "../_components/campaigns/CampaignCardSkeleton";
 
 export default async function CampaignsPage() {
   const campaigns = await getCampaignsAction();
+  const scheduledCampaigns = await getScheduledCampaignsAction();
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -15,13 +20,23 @@ export default async function CampaignsPage() {
         </p>
       </div>
 
-      <Suspense fallback={<CampaignsDashboardSkeleton />}>
-        <CampaignsDashboard initialCampaigns={campaigns || []} />
-      </Suspense>
+      <div className="space-y-8">
+        {scheduledCampaigns && scheduledCampaigns.length > 0 && (
+          <ScheduledCampaignsSection scheduledCampaigns={scheduledCampaigns} />
+        )}
+
+        <div>
+          <h2 className="text-xl font-semibold mb-4">
+            Active & Completed Campaigns
+          </h2>
+          <Suspense fallback={<CampaignsDashboardSkeleton />}>
+            <CampaignsDashboard initialCampaigns={campaigns || []} />
+          </Suspense>
+        </div>
+      </div>
     </div>
   );
 }
-
 
 const CampaignsDashboardSkeleton = () => {
   return (
@@ -31,4 +46,4 @@ const CampaignsDashboardSkeleton = () => {
       ))}
     </div>
   );
-};  
+};

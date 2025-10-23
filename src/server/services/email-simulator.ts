@@ -1,13 +1,13 @@
 import { Worker } from "worker_threads";
 import path from "path";
 
-export const simulateEmailSending = (runId: string): void => {
+export const simulateEmailSending = (scheduledCampaignId: string): void => {
   const workerPath = path.join(
     process.cwd(),
     "src/server/workers/email-worker.ts",
   );
   const worker = new Worker(workerPath, {
-    workerData: { runId },
+    workerData: { scheduledCampaignId },
     execArgv: ["--require", "tsx/cjs"],
   });
 

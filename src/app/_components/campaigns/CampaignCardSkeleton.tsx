@@ -30,4 +30,3 @@ const CampaignCardSkeleton = () => {
 };
 
 export default CampaignCardSkeleton;
-

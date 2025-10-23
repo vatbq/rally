@@ -38,3 +38,40 @@ Reply to this email to schedule an appointment, or call us at your convenience.
 Best regards,
 Your Service Team`;
 };
+
+export const formatDate = (date: Date) => {
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
+export const formatTime = (date: Date) => {
+  return new Date(date).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
+export const getTimeUntil = (scheduledFor: Date) => {
+  const now = new Date();
+  const target = new Date(scheduledFor);
+  const diff = target.getTime() - now.getTime();
+
+  if (diff < 0) return "Executing soon...";
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (hours > 24) {
+    const days = Math.floor(hours / 24);
+    return `in ${days} ${days === 1 ? "day" : "days"}`;
+  }
+
+  if (hours > 0) {
+    return `in ${hours}h ${minutes}m`;
+  }
+
+  return `in ${minutes}m`;
+};

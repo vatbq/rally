@@ -7,7 +7,7 @@ import { simulateEmailSending } from "./email-simulator";
 
 export const getCampaigns = async (): Promise<Campaign[]> => {
   return await db.ruleRun.findMany({
-    include: {  
+    include: {
       rule: true,
       emails: {
         include: {
@@ -135,7 +135,7 @@ export const executeEmailCampaign = async (ruleId: string) => {
 export const scheduleEmailCampaign = async (
   ruleId: string,
   scheduledFor: Date,
-  timezone: string
+  timezone: string,
 ) => {
   const now = new Date();
 
@@ -169,8 +169,7 @@ export const getScheduledCampaigns = async () => {
     where: {
       status: {
         in: [
-          ScheduledCampaignStatus.PENDING,
-          ScheduledCampaignStatus.EXECUTING,
+          ScheduledCampaignStatus.PENDING
         ],
       },
     },
@@ -209,12 +208,6 @@ export const executeScheduledCampaign = async (scheduledCampaignId: string) => {
     throw new Error("Scheduled campaign is not in PENDING status");
   }
 
-  // Mark as EXECUTING
-  await db.scheduledCampaign.update({
-    where: { id: scheduledCampaignId },
-    data: { status: ScheduledCampaignStatus.EXECUTING },
-  });
-
   try {
     const cohort = await previewRuleCohort(scheduled.ruleId);
 
@@ -226,10 +219,10 @@ export const executeScheduledCampaign = async (scheduledCampaignId: string) => {
           executedAt: new Date(),
         },
       });
+            
       return null;
     }
 
-    // Create run and emails in transaction
     let runId: string | undefined;
 
     await db.$transaction(async (tx) => {
@@ -260,15 +253,16 @@ export const executeScheduledCampaign = async (scheduledCampaignId: string) => {
           body: generateEmailBody(scheduled.rule, member),
         })),
       });
+    });
 
-      await tx.scheduledCampaign.update({
-        where: { id: scheduledCampaignId },
-        data: {
-          status: ScheduledCampaignStatus.COMPLETED,
-          executedAt: new Date(),
-          executedRunId: run.id,
-        },
-      });
+    // Mark as completed after successful creation
+    await db.scheduledCampaign.update({
+      where: { id: scheduledCampaignId },
+      data: {
+        status: ScheduledCampaignStatus.COMPLETED,
+        executedAt: new Date(),
+        executedRunId: runId,
+      },
     });
 
     if (runId) {
@@ -280,7 +274,7 @@ export const executeScheduledCampaign = async (scheduledCampaignId: string) => {
     console.error(
       "\x1b[31m%s\x1b[0m",
       `[Scheduler] Failed to execute scheduled campaign ${scheduledCampaignId}:`,
-      error
+      error,
     );
     await db.scheduledCampaign.update({
       where: { id: scheduledCampaignId },
@@ -304,7 +298,7 @@ export const cancelScheduledCampaign = async (scheduledCampaignId: string) => {
     scheduled.status !== ScheduledCampaignStatus.EXECUTING
   ) {
     throw new Error(
-      "Cannot cancel a campaign that is not pending or executing"
+      "Cannot cancel a campaign that is not pending or executing",
     );
   }
 
@@ -316,4 +310,3 @@ export const cancelScheduledCampaign = async (scheduledCampaignId: string) => {
     },
   });
 };
-

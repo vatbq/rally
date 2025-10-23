@@ -1,4 +1,9 @@
-import { Email, Rule, RuleRun } from "@prisma/client";
+import {
+  Email,
+  Rule,
+  RuleRun,
+  ScheduledCampaign as ScheduledCampaignPrisma,
+} from "@prisma/client";
 
 export interface Campaign extends RuleRun {
   rule: Rule;
@@ -7,4 +12,8 @@ export interface Campaign extends RuleRun {
     emails: number;
     ruleTargets: number;
   };
+}
+
+export interface ScheduledCampaign extends ScheduledCampaignPrisma {
+  rule: Rule;
 }

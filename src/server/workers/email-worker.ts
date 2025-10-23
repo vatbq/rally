@@ -1,15 +1,15 @@
 import { parentPort, workerData } from "worker_threads";
 import { db } from "@/server/db";
-import { EmailStatus } from "@prisma/client";
+import { EmailStatus, ScheduledCampaignStatus } from "@prisma/client";
 
 interface WorkerData {
-  runId: string;
+  scheduledCampaignId: string;
 }
 
-const processEmails = async (runId: string) => {
+const processEmails = async (scheduledCampaignId: string) => {
   const emailsToProcess = await db.email.findMany({
     where: {
-      runId: runId,
+      runId: scheduledCampaignId,
     },
     orderBy: {
       queuedAt: "asc",
@@ -37,23 +37,28 @@ const processEmails = async (runId: string) => {
 
   // mark run as completed
   await db.ruleRun.update({
-    where: { id: runId },
+    where: { id: scheduledCampaignId },
     data: { completedAt: new Date() },
+  });
+
+  await db.scheduledCampaign.update({
+    where: { executedRunId: scheduledCampaignId },
+    data: { status: ScheduledCampaignStatus.COMPLETED },
   });
 
   return {
     success: true,
     result: {
       processed: emailsToProcess.length,
-      runId,
+      scheduledCampaignId,
     },
   };
 };
 
 (async () => {
   try {
-    const { runId } = workerData as WorkerData;
-    const result = await processEmails(runId);
+    const { scheduledCampaignId } = workerData as WorkerData;
+    const result = await processEmails(scheduledCampaignId);
 
     if (parentPort) {
       parentPort.postMessage({ success: true, result });

@@ -6,10 +6,6 @@ import {
   getRules,
   previewRuleCohort,
   createRule,
-  getRuleRuns,
-  getIncompleteRuleRuns,
-  getRuleRun,
-  sendEmailCampaign,
 } from "@/server/services/rules";
 import { CreateRule } from "@/schemas/rules";
 
@@ -31,27 +27,4 @@ export const createRuleAction = async (data: CreateRule) => {
     revalidatePath("/rules");
     redirect("/rules");
   }
-};
-
-export const sendEmailCampaignAction = async (ruleId: string) => {
-  try {
-    const result = await sendEmailCampaign(ruleId);
-    revalidatePath("/campaigns");
-    return result;
-  } catch (error) {
-    console.error("Error launching campaign:", error);
-    return { success: false, message: "Failed to launch campaign" };
-  }
-};
-
-export const getRuleRunsAction = async () => {
-  return await getRuleRuns();
-};
-
-export const getRuleRunAction = async (runId: string) => {
-  return await getRuleRun(runId);
-};
-
-export const getIncompleteRuleRunsAction = async () => {
-  return await getIncompleteRuleRuns();
 };

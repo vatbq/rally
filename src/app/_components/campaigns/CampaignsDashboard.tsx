@@ -5,10 +5,10 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity } from "lucide-react";
 import {
-  getIncompleteRuleRunsAction,
-} from "@/app/_actions/rules";
+  getIncompleteCampaignsAction,
+} from "@/app/_actions/campaigns";
+import { type Campaign } from "@/server/interfaces/campaigns";
 import CampaignCard from "./CampaignCard";
-import { type Campaign } from "@/server/interfaces/rules";
 
 interface CampaignsDashboardProps {
   initialCampaigns: Campaign[];
@@ -25,7 +25,7 @@ export function CampaignsDashboard({ initialCampaigns }: CampaignsDashboardProps
     }
 
     const interval = setInterval(async () => {
-      const incompleteCampaigns: Campaign[] = await getIncompleteRuleRunsAction();
+      const incompleteCampaigns: Campaign[] = await getIncompleteCampaignsAction();
 
       setCampaigns((prevCampaigns) => {
         const nowCompleted = prevCampaigns

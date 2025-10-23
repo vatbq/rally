@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Send, Users, AlertCircle, CheckCircle } from "lucide-react";
-import { sendEmailCampaignAction } from "@/app/_actions/rules";
+import { sendEmailCampaignAction } from "@/app/_actions/campaigns";
 import { Cohort } from "@/server/interfaces/rules";
 
 interface SendCampaignDialogProps {

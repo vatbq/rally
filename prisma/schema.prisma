@@ -32,6 +32,14 @@ enum EmailStatus {
   FAILED     
 }
 
+enum ScheduledCampaignStatus {
+  PENDING    
+  EXECUTING  
+  COMPLETED  
+  CANCELLED  
+  FAILED     
+}
+
 model Customer {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -58,7 +66,7 @@ model Vehicle {
   serviceHistory ServiceHistory[]
   appointments   Appointment[]
   ruleTargets    RuleTarget[]
-  Email          Email[]
+  emails          Email[]
 }
 
 model ServiceHistory {
@@ -83,9 +91,10 @@ model Rule {
   emailTemplate   String
   createdAt       DateTime    @default(now())
 
-  runs        RuleRun[]
-  ruleTargets RuleTarget[]
-  Email       Email[]
+  runs               RuleRun[]
+  ruleTargets        RuleTarget[]
+  emails             Email[]
+  scheduledCampaigns ScheduledCampaign[]
 }
 
 model RuleRun {
@@ -94,9 +103,25 @@ model RuleRun {
   startedAt   DateTime  @default(now())
   completedAt DateTime?
 
-  rule        Rule         @relation(fields: [ruleId], references: [id], onDelete: Cascade)
-  ruleTargets RuleTarget[]
-  Email       Email[]
+  rule              Rule               @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  ruleTargets       RuleTarget[]
+  emails            Email[]
+  scheduledCampaign ScheduledCampaign?
+}
+
+model ScheduledCampaign {
+  id            String                  @id @default(uuid())
+  ruleId        String
+  scheduledFor  DateTime                
+  timezone      String                  @default("America/Los_Angeles")
+  status        ScheduledCampaignStatus @default(PENDING)
+  executedAt    DateTime?               
+  executedRunId String?                 @unique
+  createdAt     DateTime                @default(now())
+  cancelledAt   DateTime?
+
+  rule        Rule     @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  executedRun RuleRun? @relation(fields: [executedRunId], references: [id])
 }
 
 // Cohort per Run

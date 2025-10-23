@@ -15,9 +15,9 @@ import {
   Car,
 } from "lucide-react";
 import Link from "next/link";
-import { getRuleRunAction } from "@/app/_actions/rules";
+import { getCampaignAction } from "@/app/_actions/campaigns";
 
-type Campaign = NonNullable<Awaited<ReturnType<typeof getRuleRunAction>>>;
+type Campaign = NonNullable<Awaited<ReturnType<typeof getCampaignAction>>>;
 
 interface CampaignDetailProps {
   initialCampaign: Campaign;
@@ -36,7 +36,7 @@ export function CampaignDetail({
     }
 
     const interval = setInterval(async () => {
-      const updated = await getRuleRunAction(campaignId);
+      const updated = await getCampaignAction(campaignId);
       if (updated) {
         setCampaign(updated);
 
@@ -49,11 +49,11 @@ export function CampaignDetail({
     return () => clearInterval(interval);
   }, [campaignId, campaign.completedAt]);
 
-  const queuedEmails = campaign.Email.filter((e) => !e.sentAt);
-  const sentEmails = campaign.Email.filter((e) => e.sentAt && !e.deliveredAt);
-  const deliveredEmails = campaign.Email.filter((e) => e.deliveredAt);
+  const queuedEmails = campaign.emails.filter((e) => !e.sentAt);
+  const sentEmails = campaign.emails.filter((e) => e.sentAt && !e.deliveredAt);
+  const deliveredEmails = campaign.emails.filter((e) => e.deliveredAt);
 
-  const getEmailStatus = (email: (typeof campaign.Email)[0]) => {
+  const getEmailStatus = (email: (typeof campaign.emails)[0]) => {
     if (email.deliveredAt) {
       return {
         label: "Delivered",
@@ -120,7 +120,7 @@ export function CampaignDetail({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Total Emails</p>
-                <p className="text-3xl font-bold">{campaign.Email.length}</p>
+                <p className="text-3xl font-bold">{campaign.emails.length}</p>
               </div>
               <Mail className="h-8 w-8 text-muted-foreground" />
             </div>
@@ -177,7 +177,7 @@ export function CampaignDetail({
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {campaign.Email.map((email) => {
+            {campaign.emails.map((email) => {
               const status = getEmailStatus(email);
               const StatusIcon = status.icon;
 

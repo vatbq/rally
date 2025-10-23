@@ -1,10 +1,10 @@
-import { getRuleRunsAction } from "@/app/_actions/rules";
+import { getCampaignsAction } from "@/app/_actions/campaigns";
 import { CampaignsDashboard } from "@/app/_components/campaigns/CampaignsDashboard";
 import { Suspense } from "react";
 import CampaignCardSkeleton from "../_components/campaigns/CampaignCardSkeleton";
 
 export default async function CampaignsPage() {
-  const campaigns = await getRuleRunsAction();
+  const campaigns = await getCampaignsAction();
 
   return (
     <div className="container mx-auto px-4 py-8">

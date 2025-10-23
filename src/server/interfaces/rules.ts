@@ -1,4 +1,4 @@
-import { Customer, Email, Rule, RuleRun, ServiceHistory, Vehicle } from "@prisma/client";
+import { Customer, ServiceHistory, Vehicle } from "@prisma/client";
 
 export interface CohortMemberVehicle extends Omit<Vehicle, "id"> {
   vehicleId: string;
@@ -7,12 +7,3 @@ export interface CohortMemberVehicle extends Omit<Vehicle, "id"> {
 }
 
 export type Cohort = CohortMemberVehicle[];
-
-export interface Campaign extends RuleRun {
-  rule: Rule;
-  Email: Email[];
-  _count: {
-    Email: number;
-    ruleTargets: number;
-  };
-}

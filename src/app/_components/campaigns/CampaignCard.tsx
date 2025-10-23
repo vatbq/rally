@@ -5,7 +5,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { SERVICE_TYPE_LABELS } from "@/constants/rules";
-import { type Campaign } from "@/server/interfaces/rules";
+import { type Campaign } from "@/server/interfaces/campaigns";
 
 interface CampaignCardProps {
   campaign: Campaign;

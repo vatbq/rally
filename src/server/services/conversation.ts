@@ -165,7 +165,6 @@ const createAppointment = async (
     bookingIntent.endsAt &&
     vehicle
   ) {
-    // Check if appointment already exists for this email
     const recentAppointment = await db.appointment.findFirst({
       where: {
         threadId: firstEmailId,

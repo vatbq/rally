@@ -17,8 +17,22 @@ export type BookingIntent = {
 export async function detectBookingIntent(
   conversationHistory: string,
 ): Promise<BookingIntent> {
+  const currentDate = new Date();
+  const formattedCurrentDate = currentDate.toLocaleString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'America/New_York'
+  });
+  
   const prompt = `
 Analyze this conversation to determine if an appointment should be created.
+
+CURRENT DATE AND TIME: ${formattedCurrentDate}
 
 CONVERSATION:
 ${conversationHistory}
@@ -49,11 +63,26 @@ NOT BOOKING INTENT (return false):
 IMPORTANT:
 - If the customer's most recent message is vague (e.g., "Thursday afternoon"), return false (agent should suggest times instead)
 
-If you conclude there IS booking intent with confidence high, also EXTRACT the precise appointment time range from the customer's most recent message or the previously proposed time. Use the following rules:
-- Parse natural language times and convert to ISO-8601 in the dealership's local time.
-- If duration is not stated, assume 1 hour.
-- If only a start time is provided, set endsAt to start time + 1 hour.
-- If a specific date is not given but a weekday is, infer the next occurrence of that weekday.
+If you conclude there IS booking intent with confidence high, also EXTRACT the precise appointment time range. Use the following rules:
+
+EXTRACTION PROCESS:
+1. Read through the conversation to find the most recent time that was agreed upon
+2. If dealer suggested a time (e.g., "How about Saturday at 10am?") and customer confirmed (e.g., "That works!"), use the dealer's suggested time (10am)
+3. If customer proposed a time (e.g., "Can I come Saturday at 2pm?"), use the customer's proposed time (2pm)
+4. DO NOT invent or change times - use the EXACT hour and time that was mentioned
+
+FORMATTING:
+- Parse natural language times and convert to ISO-8601 in the dealership's local time (America/New_York timezone)
+- Use the CURRENT DATE AND TIME provided above to calculate relative dates
+- When "this Saturday" or "next Tuesday" is mentioned, calculate from the CURRENT DATE (not from any arbitrary date)
+- ALL appointments MUST be in the FUTURE relative to the CURRENT DATE AND TIME provided above
+- If duration is not stated, assume 1 hour
+- If only a start time is provided, set endsAt to start time + 1 hour
+
+EXAMPLE:
+Current Date: Wednesday, October 23, 2025 at 10:30 PM
+Conversation: "dealer: How about this Saturday at 10am? customer: Sounds great!"
+→ startsAt should be Saturday, October 26, 2025 at 10:00 AM (the NEXT Saturday after Oct 23, NOT any past date)
 
 Respond with ONLY valid JSON:
 {

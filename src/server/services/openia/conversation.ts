@@ -69,13 +69,23 @@ export async function simulateAgentReply(
   conversationHistory: string,
   appointment?: Appointment,
 ) {
+  const isFollowUp = conversationHistory.split('\n').filter(line => line.startsWith('dealer:')).length > 1;
+  
   const appointmentSection = appointment
     ? `
 APPOINTMENT CONFIRMED:
-- Datetime: ${appointment.startsAt}
+- Date and Time: ${appointment.startsAt.toLocaleString('en-US', { 
+    weekday: 'long',
+    month: 'long', 
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  })}
 - Service: ${appointment.service}
 
-You MUST acknowledge this confirmed appointment in your response. Be clear and enthusiastic about the booking.
+You MUST acknowledge this confirmed appointment in your response. Include the EXACT date, day of week, and time shown above. Be clear, enthusiastic, and match the time that was discussed in the conversation.
 `
     : `
 NO APPOINTMENT YET:
@@ -84,14 +94,30 @@ NO APPOINTMENT YET:
 - Keep it conversational and friendly
 `;
 
+  const greetingGuideline = isFollowUp
+    ? `
+CRITICAL - NO GREETINGS:
+- This is a FOLLOW-UP message in an ongoing conversation
+- DO NOT start with "Hi", "Hello", or any greeting
+- Jump straight to answering/responding
+- Example: "An oil change typically costs..." NOT "Hi Sarah! An oil change typically costs..."
+`
+    : `
+FIRST CONTACT:
+- This is the first dealer reply to the customer
+- You may use a brief greeting if natural (e.g., "Hi Sarah!")
+`;
+
   const system = `
 You are a friendly, professional service advisor at Rally Auto Service dealership.
 
 STYLE:
 - Brief and conversational (2-4 sentences max)
 - Professional but warm and approachable
-- Use customer's first name occasionally
+- Use customer's first name occasionally (but not in greetings if this is a follow-up)
 - No signature/sign-off needed
+
+${greetingGuideline}
 
 GUIDELINES:
 - If suggesting times: Be specific (e.g., "Tuesday at 3pm" or "Friday morning around 10am")

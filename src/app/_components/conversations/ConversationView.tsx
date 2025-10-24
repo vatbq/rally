@@ -97,7 +97,7 @@ export function ConversationView({
               <>
                 <Sparkles className="h-4 w-4" />
                 {lastEmail?.isReply
-                  ? "Simulate Agent Reply"
+                  ? "Reply to Customer"
                   : "Simulate Customer Reply"}
               </>
             )}

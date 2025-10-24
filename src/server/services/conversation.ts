@@ -25,7 +25,6 @@ export const getConversation = async (threadId: string) => {
   return emails;
 };
 
-
 export const simulateNextReply = async (threadId: string) => {
   const emails: Email[] = await db.email.findMany({
     where: { threadId },
@@ -101,7 +100,12 @@ async function generateAgentReply(threadId: string, emails: Email[]) {
     .map((email) => `${email.isReply ? "customer" : "dealer"}: ${email.body}`)
     .join("\n\n");
 
-  const appointmentDetails = await createAppointment(firstEmail.id, conversationHistory, vehicle, serviceType);
+  const appointmentDetails = await createAppointment(
+    firstEmail.id,
+    conversationHistory,
+    vehicle,
+    serviceType,
+  );
 
   const agentReply = await simulateAgentReply(
     customer.firstName || "Customer",
@@ -142,11 +146,16 @@ async function generateAgentReply(threadId: string, emails: Email[]) {
       },
     });
   }
-  
+
   return replyEmail;
 }
 
-const createAppointment = async (firstEmailId: string, conversationHistory: string, vehicle: Vehicle, serviceType: ServiceType) => {
+const createAppointment = async (
+  firstEmailId: string,
+  conversationHistory: string,
+  vehicle: Vehicle,
+  serviceType: ServiceType,
+) => {
   const bookingIntent = await detectBookingIntent(conversationHistory);
 
   if (
@@ -182,4 +191,4 @@ const createAppointment = async (firstEmailId: string, conversationHistory: stri
   }
 
   return undefined;
-}
+};

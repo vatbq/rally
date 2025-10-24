@@ -33,3 +33,31 @@ export async function createAppointmentFromConversation({
 
   return appointment;
 }
+
+export async function updateAppointmentStatus(appointmentId: string, status: AppointmentStatus): Promise<Appointment> {
+   const appointment = await db.appointment.findUnique({
+    where: { id: appointmentId },
+  });
+
+  if (!appointment) {
+    throw new Error("Appointment not found");
+  }
+
+  const updatedAppointment = await db.appointment.update({
+    where: { id: appointmentId },
+    data: { status },
+  });
+
+  if (status === AppointmentStatus.COMPLETED) {
+    await db.serviceHistory.create({
+      data: {
+        vehicleId: appointment.vehicleId,
+        service: appointment.service,
+        performedAt: appointment.startsAt,
+        notes: appointment.notes,
+      },
+    });
+  }
+
+  return updatedAppointment;
+}

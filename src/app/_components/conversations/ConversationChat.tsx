@@ -2,17 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  User,
-  Send,
-  MessageCircle,
-  Calendar,
-  CheckCircle2,
-} from "lucide-react";
-import {
-  getConversationAction,
-} from "@/app/_actions/conversations";
-import { SERVICE_TYPE_LABELS } from "@/constants/rules";
+import { User, Send, MessageCircle } from "lucide-react";
+import { getConversationAction } from "@/app/_actions/conversations";
+import { AppointmentNotification } from "./AppointmentNotification";
 
 type Emails = Awaited<ReturnType<typeof getConversationAction>>;
 
@@ -20,9 +12,7 @@ interface ConversationViewProps {
   emails: Emails;
 }
 
-export function ConversationChat({
-  emails,
-}: ConversationViewProps) {
+export function ConversationChat({ emails }: ConversationViewProps) {
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -93,48 +83,10 @@ export function ConversationChat({
                 </div>
 
                 {appointmentBooked && (
-                  <div className="flex justify-center my-4">
-                    <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 max-w-md shadow-sm">
-                      <div className="flex items-start gap-3">
-                        <div className="bg-green-100 rounded-full p-2">
-                          <CheckCircle2 className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Calendar className="h-4 w-4 text-green-700" />
-                            <p className="font-semibold text-green-900">
-                              Appointment Booked
-                            </p>
-                          </div>
-                          <div className="text-sm text-green-800 space-y-1">
-                            <p>
-                              <span className="font-medium">Date:</span>{" "}
-                              {new Date(
-                                appointmentBooked.startsAt,
-                              ).toLocaleDateString("en-US", {
-                                weekday: "long",
-                                month: "long",
-                                day: "numeric",
-                              })}
-                            </p>
-                            <p>
-                              <span className="font-medium">Time:</span>{" "}
-                              {new Date(
-                                appointmentBooked.startsAt,
-                              ).toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                              })}
-                            </p>
-                            <p>
-                              <span className="font-medium">Service:</span>{" "}
-                              {SERVICE_TYPE_LABELS[appointmentBooked.service]}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <AppointmentNotification
+                    startsAt={appointmentBooked.startsAt}
+                    service={appointmentBooked.service}
+                  />
                 )}
               </div>
             );

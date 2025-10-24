@@ -11,6 +11,39 @@ export const createRule = async (data: CreateRule) => {
   return await db.rule.create({ data });
 };
 
+export const getRule = async (ruleId: string) => {
+  const rule = await db.rule.findUnique({
+    where: { id: ruleId },
+    include: {
+      runs: {
+        include: {
+          emails: {
+            include: {
+              customer: true,
+              vehicle: true,
+            },
+          },
+        },
+        orderBy: {
+          startedAt: "desc",
+        },
+      },
+      scheduledCampaigns: {
+        where: {
+          status: {
+            in: ["PENDING", "EXECUTING"],
+          },
+        },
+        orderBy: {
+          scheduledFor: "asc",
+        },
+      },
+    },
+  });
+
+  return rule;
+};
+
 export const previewRuleCohort = async (ruleId: string): Promise<Cohort> => {
   const rule = await db.rule.findUnique({
     where: { id: ruleId },

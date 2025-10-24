@@ -13,7 +13,7 @@ interface CampaignCardProps {
 const CampaignCard = ({ campaign }: CampaignCardProps) => {
   return (
     <Link href={`/campaigns/${campaign.id}`}>
-      <Card className="hover:shadow-lg transition-all hover:scale-[1.01] cursor-pointer max-w-[300px]">
+      <Card className="hover:shadow-lg transition-all hover:scale-[1.01] cursor-pointer">
         <CardHeader className="p-4 space-y-3">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0 flex-1">

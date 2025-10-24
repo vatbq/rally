@@ -14,4 +14,3 @@ export async function generateAIReplyAction(threadId: string) {
   await simulateNextReply(threadId);
   revalidatePath(`/conversations/${threadId}`, "page");
 }
-

@@ -12,12 +12,9 @@ export default async function CampaignsPage() {
   const scheduledCampaigns = await getScheduledCampaignsAction();
 
   return (
-    <>  
+    <>
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Campaign Console</h1>
-        <p className="text-muted-foreground">
-          Monitor your email campaigns and engagement
-        </p>
       </div>
 
       <div className="space-y-8">

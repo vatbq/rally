@@ -75,3 +75,9 @@ TODO: remove worker, overkill !
 
 --- emails
 adding thread so I can group them by campaign. is Reply so I can show them as conversation in the UI, quick way to do it.
+
+---
+
+cosas q no funcionan: despues de que se inicia el proceso scheduleado no se actualiza en real time
+
+--- mostrar template !!!

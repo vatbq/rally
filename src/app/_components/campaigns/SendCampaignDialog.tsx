@@ -93,17 +93,16 @@ export const SendCampaignDialog = ({
     try {
       if (data.mode === Mode.NOW) {
         await sendEmailCampaignAction(ruleId);
+
         setResult({
           success: true,
           message: "Campaign launched successfully!",
         });
-        setTimeout(() => {
-          setOpen(false);
-          setResult(null);
-          form.reset();
-        }, 1000);
+
+        setOpen(false);
+        setResult(null);
+        form.reset();
       } else {
-        // Combine date and time into a DateTime
         const scheduledFor = new Date(
           `${data.scheduledDate}T${data.scheduledTime}`,
         );
@@ -180,7 +179,6 @@ export const SendCampaignDialog = ({
               </Suspense>
             )}
 
-            {/* Mode Toggle */}
             <div className="flex gap-2 p-1 bg-muted rounded-lg">
               <button
                 type="button"
@@ -208,7 +206,6 @@ export const SendCampaignDialog = ({
               </button>
             </div>
 
-            {/* Schedule Inputs */}
             {mode === Mode.SCHEDULE && (
               <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
                 <FormField
@@ -224,7 +221,7 @@ export const SendCampaignDialog = ({
                         <Input
                           type="date"
                           {...field}
-                          min={new Date().toISOString().split("T")[0]}
+                          min={new Date().toLocaleDateString().split("T")[0]}
                         />
                       </FormControl>
                       <FormMessage />

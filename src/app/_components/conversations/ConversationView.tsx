@@ -22,13 +22,9 @@ export function ConversationView({
   threadId,
   initialEmails,
 }: ConversationViewProps) {
-
-  const [, action, isGeneratingReply] = useActionState(
-    async () => {
-      await generateAIReplyAction(threadId);
-    },
-    null,
-  );
+  const [, action, isGeneratingReply] = useActionState(async () => {
+    await generateAIReplyAction(threadId);
+  }, null);
 
   const firstEmail = initialEmails[0];
 

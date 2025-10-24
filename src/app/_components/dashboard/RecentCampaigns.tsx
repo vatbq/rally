@@ -56,7 +56,9 @@ export async function RecentCampaigns() {
             <div className="flex flex-col space-y-2 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
               <div className="flex items-start justify-between">
                 <div className="space-y-1 flex-1">
-                  <div className="font-medium text-sm">{campaign.rule.name}</div>
+                  <div className="font-medium text-sm">
+                    {campaign.rule.name}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     {SERVICE_TYPE_LABELS[campaign.rule.service]}
                   </div>
@@ -93,4 +95,3 @@ export async function RecentCampaigns() {
     </Card>
   );
 }
-

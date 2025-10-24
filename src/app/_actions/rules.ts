@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   getRules,
+  getRule,
   previewRuleCohort,
   createRule,
 } from "@/server/services/rules";
@@ -11,6 +12,10 @@ import { CreateRule } from "@/schemas/rules";
 
 export const getRulesAction = async () => {
   return await getRules();
+};
+
+export const getRuleAction = async (ruleId: string) => {
+  return await getRule(ruleId);
 };
 
 export const previewRuleCohortAction = async (ruleId: string) => {

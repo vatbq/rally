@@ -8,7 +8,6 @@ interface AppointmentNotificationProps {
 
 export function AppointmentNotification({
   startsAt,
-  service,
 }: AppointmentNotificationProps) {
   return (
     <div className="flex justify-center my-3">
@@ -42,4 +41,3 @@ export function AppointmentNotification({
     </div>
   );
 }
-

@@ -16,4 +16,3 @@ export default async function CustomerDetailPage({
 
   return <CustomerDetail customer={customer} />;
 }
-

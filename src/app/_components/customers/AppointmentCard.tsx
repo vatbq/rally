@@ -9,7 +9,7 @@ import { AppointmentStatus } from "@prisma/client";
 import { Appointment } from "@/server/interfaces/appointment";
 
 interface AppointmentCardProps {
-  appointment: Appointment
+  appointment: Appointment;
 }
 
 export function AppointmentCard({ appointment }: AppointmentCardProps) {
@@ -24,7 +24,9 @@ export function AppointmentCard({ appointment }: AppointmentCardProps) {
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <p className="font-medium">{SERVICE_TYPE_LABELS[appointment.service]}</p>
+            <p className="font-medium">
+              {SERVICE_TYPE_LABELS[appointment.service]}
+            </p>
             <span
               className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                 appointment.status === "COMPLETED"
@@ -49,7 +51,7 @@ export function AppointmentCard({ appointment }: AppointmentCardProps) {
               {appointment.notes}
             </p>
           )}
-          
+
           {isBooked && (
             <div className="flex items-center gap-2 mt-3">
               <Button
@@ -88,4 +90,3 @@ export function AppointmentCard({ appointment }: AppointmentCardProps) {
     </div>
   );
 }
-

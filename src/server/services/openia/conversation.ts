@@ -69,20 +69,22 @@ export async function simulateAgentReply(
   conversationHistory: string,
   appointment?: Appointment,
 ) {
-  const isFollowUp = conversationHistory.split('\n').filter(line => line.startsWith('dealer:')).length > 1;
-  
+  const isFollowUp =
+    conversationHistory.split("\n").filter((line) => line.startsWith("dealer:"))
+      .length > 1;
+
   const appointmentSection = appointment
     ? `
 APPOINTMENT CONFIRMED:
-- Date and Time: ${appointment.startsAt.toLocaleString('en-US', { 
-    weekday: 'long',
-    month: 'long', 
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  })}
+- Date and Time: ${appointment.startsAt.toLocaleString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })}
 - Service: ${appointment.service}
 
 You MUST acknowledge this confirmed appointment in your response. Include the EXACT date, day of week, and time shown above. Be clear, enthusiastic, and match the time that was discussed in the conversation.

@@ -34,8 +34,11 @@ export async function createAppointmentFromConversation({
   return appointment;
 }
 
-export async function updateAppointmentStatus(appointmentId: string, status: AppointmentStatus): Promise<Appointment> {
-   const appointment = await db.appointment.findUnique({
+export async function updateAppointmentStatus(
+  appointmentId: string,
+  status: AppointmentStatus,
+): Promise<Appointment> {
+  const appointment = await db.appointment.findUnique({
     where: { id: appointmentId },
   });
 

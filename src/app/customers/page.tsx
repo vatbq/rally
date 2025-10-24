@@ -16,11 +16,13 @@ const CustomersPage = async () => {
 };
 
 const CustomersDashboardSkeleton = () => {
-  return <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4">
-    {[...Array(6)].map((_, index) => (
-      <Skeleton key={index} />
-    ))}
-  </div>
-}
+  return (
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4">
+      {[...Array(6)].map((_, index) => (
+        <Skeleton key={index} />
+      ))}
+    </div>
+  );
+};
 
 export default CustomersPage;

@@ -18,17 +18,17 @@ export async function detectBookingIntent(
   conversationHistory: string,
 ): Promise<BookingIntent> {
   const currentDate = new Date();
-  const formattedCurrentDate = currentDate.toLocaleString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
+  const formattedCurrentDate = currentDate.toLocaleString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
     hour12: true,
-    timeZone: 'America/New_York'
+    timeZone: "America/New_York",
   });
-  
+
   const prompt = `
 Analyze this conversation to determine if an appointment should be created.
 

@@ -1,5 +1,5 @@
 import { Cohort } from "@/server/interfaces/rules";
-import { Rule } from "@prisma/client";
+import { RecurringFrequency, Rule } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -60,6 +60,43 @@ export const formatTime = (date: Date) => {
     hour: "numeric",
     minute: "2-digit",
   });
+};
+
+export const formatDateTime = (date: Date | string): string => {
+  const d = new Date(date);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+};
+
+export const formatFrequency = (
+  frequency: RecurringFrequency,
+  dayOfWeek?: number | null,
+  dayOfMonth?: number | null,
+): string => {
+  switch (frequency) {
+    case RecurringFrequency.DAILY:
+      return "Daily";
+    case RecurringFrequency.WEEKLY:
+      const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+      return `Weekly on ${days[dayOfWeek ?? 0]}`;
+    case RecurringFrequency.MONTHLY:
+      return `Monthly on day ${dayOfMonth ?? 1}`;
+    default:
+      return frequency;
+  }
 };
 
 export const getTimeUntil = (scheduledFor: Date) => {

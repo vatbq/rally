@@ -40,6 +40,12 @@ enum ScheduledCampaignStatus {
   FAILED     
 }
 
+enum RecurringFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+}
+
 model Customer {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -95,6 +101,7 @@ model Rule {
   ruleTargets        RuleTarget[]
   emails             Email[]
   scheduledCampaigns ScheduledCampaign[]
+  recurringSchedules RecurringSchedule[]
 }
 
 model RuleRun {
@@ -110,18 +117,40 @@ model RuleRun {
 }
 
 model ScheduledCampaign {
-  id            String                  @id @default(uuid())
-  ruleId        String
-  scheduledFor  DateTime                
-  timezone      String                  @default("America/Los_Angeles")
-  status        ScheduledCampaignStatus @default(PENDING)
-  executedAt    DateTime?               
-  executedRunId String?                 @unique
-  createdAt     DateTime                @default(now())
-  cancelledAt   DateTime?
+  id                  String                  @id @default(uuid())
+  ruleId              String
+  scheduledFor        DateTime                
+  timezone            String                  @default("America/Los_Angeles")
+  status              ScheduledCampaignStatus @default(PENDING)
+  executedAt          DateTime?               
+  executedRunId       String?                 @unique
+  recurringScheduleId String?                 // Link to recurring schedule if this was auto-generated
+  createdAt           DateTime                @default(now())
+  cancelledAt         DateTime?
 
-  rule        Rule     @relation(fields: [ruleId], references: [id], onDelete: Cascade)
-  executedRun RuleRun? @relation(fields: [executedRunId], references: [id])
+  rule              Rule               @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  executedRun       RuleRun?           @relation(fields: [executedRunId], references: [id])
+  recurringSchedule RecurringSchedule? @relation(fields: [recurringScheduleId], references: [id], onDelete: SetNull)
+}
+
+model RecurringSchedule {
+  id               String              @id @default(uuid())
+  ruleId           String
+  frequency        RecurringFrequency
+  timeOfDay        String              // Format: "HH:MM" (24-hour)
+  dayOfWeek        Int?                // 0=Sunday, 6=Saturday (for WEEKLY)
+  dayOfMonth       Int?                // 1-31 (for MONTHLY)
+  timezone         String              @default("America/Los_Angeles")
+  startsAt         DateTime            // When recurring schedule begins
+  endsAt           DateTime?           // Optional end date
+  isActive         Boolean             @default(true)
+  lastExecutedAt   DateTime?           // Last time campaign was executed
+  nextScheduledFor DateTime?           // Next scheduled execution time
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  rule               Rule                @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  scheduledCampaigns ScheduledCampaign[] // Generated campaigns
 }
 
 // Cohort per Run

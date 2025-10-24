@@ -3,7 +3,6 @@
 import { useState, use, Suspense } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,13 +33,23 @@ import {
 import {
   sendEmailCampaignAction,
   scheduleEmailCampaignAction,
+  createRecurringScheduleAction,
 } from "@/app/_actions/campaigns";
 import { Cohort } from "@/server/interfaces/rules";
 import {
   CampaignFormData,
   campaignFormSchema,
   Mode,
+  RecurringFrequency,
 } from "@/schemas/campaigns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Repeat } from "lucide-react";
 
 interface SendCampaignDialogProps {
   ruleId: string;
@@ -80,11 +89,18 @@ export const SendCampaignDialog = ({
       mode: Mode.NOW,
       scheduledDate: "",
       scheduledTime: "",
+      recurringFrequency: undefined,
+      recurringTime: "",
+      recurringDayOfWeek: undefined,
+      recurringDayOfMonth: undefined,
+      recurringStartDate: "",
+      recurringEndDate: "",
       timezone: "America/Los_Angeles",
     },
   });
 
   const mode = form.watch("mode");
+  const recurringFrequency = form.watch("recurringFrequency");
 
   const onSubmit = async (data: CampaignFormData) => {
     setLoading(true);
@@ -102,7 +118,7 @@ export const SendCampaignDialog = ({
         setOpen(false);
         setResult(null);
         form.reset();
-      } else {
+      } else if (data.mode === Mode.SCHEDULE) {
         const scheduledFor = new Date(
           `${data.scheduledDate}T${data.scheduledTime}`,
         );
@@ -127,6 +143,39 @@ export const SendCampaignDialog = ({
           setResult({
             success: false,
             message: response.message || "Failed to schedule campaign",
+          });
+        }
+      } else if (data.mode === Mode.RECURRING) {
+        // Create recurring schedule
+        const startsAt = new Date(data.recurringStartDate!);
+
+        const response = await createRecurringScheduleAction({
+          ruleId,
+          frequency: data.recurringFrequency as "DAILY" | "WEEKLY" | "MONTHLY",
+          timeOfDay: data.recurringTime!,
+          dayOfWeek: data.recurringDayOfWeek,
+          dayOfMonth: data.recurringDayOfMonth,
+          timezone: data.timezone,
+          startsAt,
+          endsAt: data.recurringEndDate
+            ? new Date(data.recurringEndDate)
+            : undefined,
+        });
+
+        if (response.success) {
+          setResult({
+            success: true,
+            message: "Recurring schedule created successfully!",
+          });
+          setTimeout(() => {
+            setOpen(false);
+            setResult(null);
+            form.reset();
+          }, 1500);
+        } else {
+          setResult({
+            success: false,
+            message: response.message || "Failed to create recurring schedule",
           });
         }
       }
@@ -179,11 +228,11 @@ export const SendCampaignDialog = ({
               </Suspense>
             )}
 
-            <div className="flex gap-2 p-1 bg-muted rounded-lg">
+            <div className="grid grid-cols-3 gap-2 p-1 bg-muted rounded-lg">
               <button
                 type="button"
                 onClick={() => form.setValue("mode", Mode.NOW)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   mode === Mode.NOW
                     ? "bg-background shadow-sm"
                     : "hover:bg-background/50"
@@ -195,7 +244,7 @@ export const SendCampaignDialog = ({
               <button
                 type="button"
                 onClick={() => form.setValue("mode", Mode.SCHEDULE)}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   mode === Mode.SCHEDULE
                     ? "bg-background shadow-sm"
                     : "hover:bg-background/50"
@@ -203,6 +252,18 @@ export const SendCampaignDialog = ({
               >
                 <Clock className="h-4 w-4" />
                 Schedule
+              </button>
+              <button
+                type="button"
+                onClick={() => form.setValue("mode", Mode.RECURRING)}
+                className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  mode === Mode.RECURRING
+                    ? "bg-background shadow-sm"
+                    : "hover:bg-background/50"
+                }`}
+              >
+                <Repeat className="h-4 w-4" />
+                Recurring
               </button>
             </div>
 
@@ -250,24 +311,172 @@ export const SendCampaignDialog = ({
               </div>
             )}
 
-            <div className="space-y-2 text-sm">
-              <p className="text-muted-foreground">
-                {mode === Mode.NOW ? "This will:" : "This will schedule:"}
-              </p>
-              <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li>Create personalized emails for each eligible customer</li>
-                <li>
-                  {mode === Mode.NOW
-                    ? "Queue emails for sending (simulated)"
-                    : "Schedule emails to be sent at the specified time"}
-                </li>
-                <li>
-                  Automatically progress through queued → sent → delivered
-                  states
-                </li>
-                <li>Track responses and engagement</li>
-              </ul>
-            </div>
+            {mode === Mode.RECURRING && (
+              <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                <FormField
+                  control={form.control}
+                  name="recurringFrequency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Frequency</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select frequency" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value={RecurringFrequency.DAILY}>
+                            Daily
+                          </SelectItem>
+                          <SelectItem value={RecurringFrequency.WEEKLY}>
+                            Weekly
+                          </SelectItem>
+                          <SelectItem value={RecurringFrequency.MONTHLY}>
+                            Monthly
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="recurringTime"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        Time
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="time" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {recurringFrequency === RecurringFrequency.WEEKLY && (
+                  <FormField
+                    control={form.control}
+                    name="recurringDayOfWeek"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Day of Week</FormLabel>
+                        <Select
+                          onValueChange={(value) =>
+                            field.onChange(parseInt(value))
+                          }
+                          value={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select day" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="0">Sunday</SelectItem>
+                            <SelectItem value="1">Monday</SelectItem>
+                            <SelectItem value="2">Tuesday</SelectItem>
+                            <SelectItem value="3">Wednesday</SelectItem>
+                            <SelectItem value="4">Thursday</SelectItem>
+                            <SelectItem value="5">Friday</SelectItem>
+                            <SelectItem value="6">Saturday</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                {recurringFrequency === RecurringFrequency.MONTHLY && (
+                  <FormField
+                    control={form.control}
+                    name="recurringDayOfMonth"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Day of Month</FormLabel>
+                        <Select
+                          onValueChange={(value) =>
+                            field.onChange(parseInt(value))
+                          }
+                          value={field.value?.toString()}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select day" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Array.from({ length: 31 }, (_, i) => i + 1).map(
+                              (day) => (
+                                <SelectItem key={day} value={day.toString()}>
+                                  {day}
+                                </SelectItem>
+                              ),
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                <FormField
+                  control={form.control}
+                  name="recurringStartDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        Start Date
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          min={new Date().toISOString().split("T")[0]}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="recurringEndDate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4" />
+                        End Date (Optional)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          {...field}
+                          min={new Date().toISOString().split("T")[0]}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="text-xs text-muted-foreground">
+                  Timezone: {form.watch("timezone")}
+                </div>
+              </div>
+            )}
 
             {result && (
               <div
@@ -300,12 +509,16 @@ export const SendCampaignDialog = ({
                 disabled={loading || (result?.success ?? false)}
               >
                 {loading
-                  ? mode === Mode.SCHEDULE
+                  ? mode === Mode.NOW
                     ? "Launching..."
-                    : "Scheduling..."
+                    : mode === Mode.SCHEDULE
+                      ? "Scheduling..."
+                      : "Creating..."
                   : mode === Mode.NOW
                     ? "Launch Now"
-                    : "Schedule Campaign"}
+                    : mode === Mode.SCHEDULE
+                      ? "Schedule Campaign"
+                      : "Create Recurring Schedule"}
               </Button>
             </DialogFooter>
           </form>

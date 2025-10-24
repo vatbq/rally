@@ -59,15 +59,15 @@ export function RuleDetail({ rule, ruleId, cohort }: RuleDetailProps) {
               <h1 className="text-3xl font-bold mb-2 flex items-center gap-2">
                 <Settings className="h-8 w-8" />
                 {rule.name}
-                 <span
-              className={`px-2 py-1 rounded-full text-xs mt-1 font-medium ${
-                rule.enabled
-                  ? "bg-green-100 text-green-800"
-                  : "bg-gray-100 text-gray-800"
-              }`}
-            >
-              {rule.enabled ? "Enabled" : "Disabled"}
-            </span>
+                <span
+                  className={`px-2 py-1 rounded-full text-xs mt-1 font-medium ${
+                    rule.enabled
+                      ? "bg-green-100 text-green-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {rule.enabled ? "Enabled" : "Disabled"}
+                </span>
               </h1>
               <p className="text-muted-foreground">
                 {SERVICE_TYPE_LABELS[rule.service]} • Created{" "}

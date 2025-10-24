@@ -13,7 +13,10 @@ interface ConversationViewProps {
   isGeneratingReply: boolean;
 }
 
-export function ConversationChat({ emails, isGeneratingReply }: ConversationViewProps) {
+export function ConversationChat({
+  emails,
+  isGeneratingReply,
+}: ConversationViewProps) {
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -30,9 +33,7 @@ export function ConversationChat({ emails, isGeneratingReply }: ConversationView
             {emails.length === 1 ? "message" : "messages"})
           </div>
           {isGeneratingReply && (
-            <span className="text-sm text-muted-foreground">
-              typing...
-            </span>
+            <span className="text-sm text-muted-foreground">typing...</span>
           )}
         </CardTitle>
       </CardHeader>
@@ -99,7 +100,7 @@ export function ConversationChat({ emails, isGeneratingReply }: ConversationView
               </div>
             );
           })}
-          
+
           <div ref={endOfMessagesRef} />
         </div>
       </CardContent>

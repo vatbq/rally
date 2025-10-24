@@ -53,7 +53,7 @@ export const getCustomer = async (customerId: string) => {
 
   const conversations = Array.from(emailThreads.values()).map((thread) => {
     const sortedThread = thread.sort(
-      (a, b) => new Date(a.queuedAt).getTime() - new Date(b.queuedAt).getTime()
+      (a, b) => new Date(a.queuedAt).getTime() - new Date(b.queuedAt).getTime(),
     );
 
     return {
@@ -65,15 +65,16 @@ export const getCustomer = async (customerId: string) => {
   });
 
   conversations.sort(
-    (a, b) => new Date(b.lastEmailAt).getTime() - new Date(a.lastEmailAt).getTime()
+    (a, b) =>
+      new Date(b.lastEmailAt).getTime() - new Date(a.lastEmailAt).getTime(),
   );
 
   const allAppointments = customer.vehicles.flatMap((vehicle) =>
-    vehicle.appointments.map((apt) => ({ ...apt, vehicle }))
+    vehicle.appointments.map((apt) => ({ ...apt, vehicle })),
   );
 
   const allServiceHistory = customer.vehicles.flatMap((vehicle) =>
-    vehicle.serviceHistory.map((service) => ({ ...service, vehicle }))
+    vehicle.serviceHistory.map((service) => ({ ...service, vehicle })),
   );
 
   return {

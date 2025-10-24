@@ -1,15 +1,18 @@
 import {
   getCampaignsAction,
   getScheduledCampaignsAction,
+  getRecurringSchedulesAction,
 } from "@/app/_actions/campaigns";
 import { CampaignsDashboard } from "@/app/_components/campaigns/CampaignsDashboard";
 import { ScheduledCampaignsSection } from "@/app/_components/campaigns/ScheduledCampaignsSection";
+import { RecurringCampaignManager } from "@/app/_components/campaigns/RecurringCampaignManager";
 import { Suspense } from "react";
 import CampaignCardSkeleton from "../_components/campaigns/CampaignCardSkeleton";
 
 export default async function CampaignsPage() {
   const campaigns = await getCampaignsAction();
   const scheduledCampaigns = await getScheduledCampaignsAction();
+  const recurringSchedules = await getRecurringSchedulesAction();
 
   return (
     <>
@@ -18,6 +21,8 @@ export default async function CampaignsPage() {
       </div>
 
       <div className="space-y-8">
+        <RecurringCampaignManager initialSchedules={recurringSchedules || []} />
+
         {scheduledCampaigns && scheduledCampaigns.length > 0 && (
           <ScheduledCampaignsSection scheduledCampaigns={scheduledCampaigns} />
         )}

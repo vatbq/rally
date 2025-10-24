@@ -2,8 +2,83 @@ import cron, { type ScheduledTask } from "node-cron";
 import { db } from "@/server/db";
 import { ScheduledCampaignStatus } from "@prisma/client";
 import { executeScheduledCampaign } from "./campaigns";
+import { calculateNextExecution } from "./recurring-schedules";
 
 let schedulerTask: ScheduledTask | null = null;
+
+const handleRecurringScheduleNext = async (recurringScheduleId: string) => {
+  try {
+    const recurringSchedule = await db.recurringSchedule.findUnique({
+      where: { id: recurringScheduleId },
+    });
+
+    if (!recurringSchedule) {
+      console.error(
+        "\x1b[31m%s\x1b[0m",
+        `[Scheduler] Recurring schedule ${recurringScheduleId} not found`,
+      );
+      return;
+    }
+
+    if (!recurringSchedule.isActive) {
+      console.log(
+        "\x1b[33m%s\x1b[0m",
+        `[Scheduler] Recurring schedule ${recurringScheduleId} is inactive, skipping next run`,
+      );
+      return;
+    }
+
+    if (recurringSchedule.endsAt && new Date() >= recurringSchedule.endsAt) {
+      console.log(
+        "\x1b[33m%s\x1b[0m",
+        `[Scheduler] Recurring schedule ${recurringScheduleId} has ended, marking as inactive`,
+      );
+      await db.recurringSchedule.update({
+        where: { id: recurringScheduleId },
+        data: { isActive: false },
+      });
+      return;
+    }
+
+    const nextScheduledFor = calculateNextExecution(
+      recurringSchedule.frequency,
+      recurringSchedule.timeOfDay,
+      recurringSchedule.timezone,
+      new Date(),
+      recurringSchedule.dayOfWeek,
+      recurringSchedule.dayOfMonth,
+    );
+
+    await db.scheduledCampaign.create({
+      data: {
+        ruleId: recurringSchedule.ruleId,
+        scheduledFor: nextScheduledFor,
+        timezone: recurringSchedule.timezone,
+        recurringScheduleId: recurringSchedule.id,
+        status: ScheduledCampaignStatus.PENDING,
+      },
+    });
+
+    await db.recurringSchedule.update({
+      where: { id: recurringScheduleId },
+      data: {
+        lastExecutedAt: new Date(),
+        nextScheduledFor,
+      },
+    });
+
+    console.log(
+      "\x1b[32m%s\x1b[0m",
+      `[Scheduler] Created next scheduled campaign for recurring schedule ${recurringScheduleId} at ${nextScheduledFor}`,
+    );
+  } catch (error) {
+    console.error(
+      "\x1b[31m%s\x1b[0m",
+      `[Scheduler] Failed to create next scheduled campaign for recurring schedule ${recurringScheduleId}:`,
+      error,
+    );
+  }
+};
 
 export const startCampaignScheduler = () => {
   if (schedulerTask) {
@@ -19,7 +94,6 @@ export const startCampaignScheduler = () => {
     "[Scheduler] Starting campaign scheduler...",
   );
 
-  // Check every minute for campaigns that need to run
   schedulerTask = cron.schedule("* * * * *", async () => {
     try {
       const now = new Date();
@@ -31,6 +105,7 @@ export const startCampaignScheduler = () => {
         },
         include: {
           rule: true,
+          recurringSchedule: true,
         },
       });
 
@@ -55,6 +130,10 @@ export const startCampaignScheduler = () => {
             "Scheduled campaign executed",
             schedule.id,
           );
+
+          if (schedule.recurringScheduleId) {
+            await handleRecurringScheduleNext(schedule.recurringScheduleId);
+          }
         } catch (error) {
           console.error(
             "\x1b[31m%s\x1b[0m",

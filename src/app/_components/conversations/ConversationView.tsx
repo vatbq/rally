@@ -105,7 +105,7 @@ export function ConversationView({
         </div>
 
         <div className="lg:col-span-2">
-          <ConversationChat emails={initialEmails} />
+          <ConversationChat emails={initialEmails} isGeneratingReply={isGeneratingReply} />
         </div>
       </div>
     </>

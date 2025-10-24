@@ -10,9 +10,10 @@ type Emails = Awaited<ReturnType<typeof getConversationAction>>;
 
 interface ConversationViewProps {
   emails: Emails;
+  isGeneratingReply: boolean;
 }
 
-export function ConversationChat({ emails }: ConversationViewProps) {
+export function ConversationChat({ emails, isGeneratingReply }: ConversationViewProps) {
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,10 +23,17 @@ export function ConversationChat({ emails }: ConversationViewProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-          <MessageCircle className="h-5 w-5" />
-          Conversation ({emails.length}{" "}
-          {emails.length === 1 ? "message" : "messages"})
+        <CardTitle className="flex items-center justify-between gap-2 text-lg font-semibold">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
+            Conversation ({emails.length}{" "}
+            {emails.length === 1 ? "message" : "messages"})
+          </div>
+          {isGeneratingReply && (
+            <span className="text-sm text-muted-foreground">
+              typing...
+            </span>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -91,6 +99,7 @@ export function ConversationChat({ emails }: ConversationViewProps) {
               </div>
             );
           })}
+          
           <div ref={endOfMessagesRef} />
         </div>
       </CardContent>

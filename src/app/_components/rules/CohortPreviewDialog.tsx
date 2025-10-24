@@ -58,7 +58,7 @@ const CohortContent = ({
                 </p>
               </div>
               <div className="text-right">
-                {member.lastService.performedAt ? (
+                {member.lastService?.performedAt ? (
                   <>
                     <p className="text-xs text-muted-foreground">
                       Last service

@@ -13,15 +13,14 @@ export const generateEmailSubject = (rule: Rule, member: Cohort[0]): string => {
 
 export const generateEmailBody = (rule: Rule, member: Cohort[0]): string => {
   const customerName = member.customer.firstName || "Customer";
-  const lastServiceDate = member.lastService.performedAt
-    ? new Date(member.lastService.performedAt).toLocaleDateString("en-US", {
+  const lastServiceDate = member.lastService?.performedAt
+    ? new Date(member.lastService?.performedAt).toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
         day: "numeric",
       })
-    : "recently";
+    : "no service history";
 
-  // Use template if provided, otherwise use default
   if (rule.emailTemplate && rule.emailTemplate.trim() !== "") {
     return rule.emailTemplate
       .replace(/\{customerName\}/g, customerName)

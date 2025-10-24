@@ -66,6 +66,8 @@ export const executeEmailCampaign = async (ruleId: string) => {
 
   const cohort = await previewRuleCohort(ruleId);
 
+  console.log("VALE cohort", cohort);
+
   if (cohort.length === 0) {
     return;
   }
@@ -88,7 +90,6 @@ export const executeEmailCampaign = async (ruleId: string) => {
       })),
     });
 
-    // Create emails with threadId set to their own id (initial emails start threads)
     for (const member of cohort) {
       const email = await tx.email.create({
         data: {
@@ -102,7 +103,6 @@ export const executeEmailCampaign = async (ruleId: string) => {
         },
       });
 
-      // Set threadId to the email's own id (this email starts the thread)
       await tx.email.update({
         where: { id: email.id },
         data: { threadId: email.id },

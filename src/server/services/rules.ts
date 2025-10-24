@@ -59,14 +59,6 @@ export const previewRuleCohort = async (ruleId: string): Promise<Cohort> => {
 
   const eligibleVehicles = await db.vehicle.findMany({
     where: {
-      serviceHistory: {
-        some: {
-          service: rule.service,
-          performedAt: {
-            lte: cutoffDate,
-          },
-        },
-      },
       appointments: {
         none: {
           service: rule.service,

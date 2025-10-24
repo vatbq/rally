@@ -1,15 +1,38 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock } from "lucide-react";
 import { type ScheduledCampaign } from "@/server/interfaces/campaigns";
 import { ScheduledCampaignItem } from "./ScheduledCampaignItem";
+import { getScheduledCampaignsAction } from "@/app/_actions/campaigns";
 
 interface ScheduledCampaignsSectionProps {
   scheduledCampaigns: ScheduledCampaign[];
 }
 
 export function ScheduledCampaignsSection({
-  scheduledCampaigns,
+  scheduledCampaigns: initialScheduledCampaigns,
 }: ScheduledCampaignsSectionProps) {
+  const [scheduledCampaigns, setScheduledCampaigns] = useState<
+    ScheduledCampaign[]
+  >(initialScheduledCampaigns);
+
+  useEffect(() => {
+    if (scheduledCampaigns.length === 0) {
+      return;
+    }
+
+    const interval = setInterval(async () => {
+      const updated = await getScheduledCampaignsAction();
+      if (updated) {
+        setScheduledCampaigns(updated);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [scheduledCampaigns.length]);
+
   if (scheduledCampaigns.length === 0) {
     return null;
   }

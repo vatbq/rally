@@ -67,7 +67,7 @@ why use workers?
 use workers for emails so we don't block the main thread and simulates the sending of the email realictisc
 add time between updates to simulates time
 
-i first get all campaings and then only pulling for the ones that are not completed. hago pulling ahora por la simulacion, pero usaria https://resend.com/.
+i first get all campaings and then only pulling for the ones that are not completed. hago pulling ahora por la simulacion, pero usaria https://resend.com/. update: al final tengo que traer siempre todas por si una scheduleada se corre.
 
 --- for scheduler, i'm just goint to build it here native so I don't use a external service, that implies checking once by minute if there are schedulers to run.
 

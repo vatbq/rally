@@ -28,32 +28,6 @@ export const getCampaigns = async (): Promise<Campaign[]> => {
   });
 };
 
-export const getIncompleteCampaigns = async (): Promise<Campaign[]> => {
-  return await db.ruleRun.findMany({
-    where: {
-      completedAt: null,
-    },
-    include: {
-      rule: true,
-      emails: {
-        include: {
-          customer: true,
-          vehicle: true,
-        },
-      },
-      _count: {
-        select: {
-          emails: true,
-          ruleTargets: true,
-        },
-      },
-    },
-    orderBy: {
-      startedAt: "desc",
-    },
-  });
-};
-
 export const getCampaign = async (campaignId: string) => {
   return await db.ruleRun.findUnique({
     where: { id: campaignId },

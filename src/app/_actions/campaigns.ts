@@ -4,7 +4,6 @@ import {
   executeEmailCampaign,
   getCampaign,
   getCampaigns,
-  getIncompleteCampaigns,
   scheduleEmailCampaign,
   getScheduledCampaigns,
   getAllScheduledCampaigns,
@@ -25,10 +24,6 @@ export const sendEmailCampaignAction = async (ruleId: string) => {
 
 export const getCampaignsAction = async () => {
   return await getCampaigns();
-};
-
-export const getIncompleteCampaignsAction = async () => {
-  return await getIncompleteCampaigns();
 };
 
 export const getCampaignAction = async (campaignId: string) => {

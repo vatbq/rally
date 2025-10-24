@@ -1,112 +1,135 @@
-# Build Notes – Approach & Thinking Log
+# Build Notes – Thinking & Decisions Log
 
-> Purpose: This doc captures my raw thinking and decisions while building the Flai Take‑Home (Service Re‑Engagement Email Agent). It’s a note‑taker for me, and a window for reviewers to see how I reasoned. I’ll add a more formal README later (trade‑offs, setup, UX tour).8
+> This doc captures my thinking and decisions while building this project. Raw notes for me, but also a window for reviewers to see how I reasoned through things.
 
 ---
 
 ## 1) Data Shape Decisions
 
-### 1.1 Service type: table or enum?
+### Service type: table or enum?
 
-- **My take:** For a bigger/real project I’d use a **table** (dynamic, can hold metadata like price, duration, locale labels).
-- For this take‑home, an **enum** is OK (fast, type‑safe). I understand the trade‑off: enums are static and need migrations to add values; tables let admins add types at runtime.
+For a bigger/real project I'd use a **table** (dynamic, can hold metadata like price, duration, locale labels). For this take-home, an **enum** is fine—fast, type-safe. I understand the trade-off: enums are static and need migrations to add values; tables let admins add types at runtime.
 
-### 1.2 Email status lifecycle
+### Email status lifecycle
 
-- **Take‑home (simulado):** `QUEUED → SENT → DELIVERED` (fake transitions).
-- **Real case:**
-  - Set to **SENDING** while calling the provider (ESP).
-  - Move to **SENT** on 200 OK.
-  - Update via webhook to **DELIVERED / BOUNCED / FAILED**.
-  - Keep an `email_events` audit trail.
+**Take-home (simulated):** `QUEUED → SENT → DELIVERED` (fake transitions)
 
-### 1.3 Cohort: vehículo y usuario o sólo vehículo?
+**Real case would be:**
+- Set to `SENDING` while calling the provider (ESP)
+- Move to `SENT` on 200 OK
+- Update via webhook to `DELIVERED / BOUNCED / FAILED`
+- Keep an `email_events` audit trail
 
-- Pensé: “Necesito agrupar _usuario + vehículo_ para el cohort.”
-- **Revisión:** No necesariamente. Con el **vehículo** alcanza para elegibilidad (service type/cadence + appointments).
-  - ¿Qué pasa si el **owner cambia** después? ¿Importa?
-  - A favor de incluir user: ver **exactamente a quién** le envié el mail.
-  - Pero, lo que importa para la regla es que el **vehículo** recibió el servicio (no la persona).
-- **Conclusión práctica (take‑home):** mantengo el modelo **centrado en vehículo** para la elegibilidad. Para simplificar las lecturas, **incluyo en el email** tanto `customerId` como `vehicleId` (así evito joins extra en conversaciones).
-- “Pense en guardar todo en cohort por vehiculo pero es messy, aunque nos sacaria una tabla, prefiero guardar una que guarde todos los vehiculos que participaron del cohort.” → Me quedo con una **tabla de cohort (RuleTarget)** por **vehículo** materializada en cada run.
+### Cohort: vehicle + user or just vehicle?
 
-### 1.4 Un vehículo puede tener más de un usuario?
+Initial thought: "I need to group _user + vehicle_ for the cohort."
 
-- **Supuesto para el home challenge:** **No** (un `Vehicle` pertenece a un `Customer`). En mundo real, pasaría a relación **N:M** con `CustomerVehicle` y `primaryContact`.
+**After thinking about it:** Not necessarily. The **vehicle** is enough for eligibility (service type/cadence + appointments).
+- What if the owner changes after? Does it matter?
+- Pro including user: see exactly who I sent the email to
+- But what matters for the rule is that the **vehicle** got the service, not the person
+
+**Practical conclusion:** Keep the model **vehicle-centric** for eligibility. To simplify reads, I include both `customerId` and `vehicleId` in the email table (avoids extra joins in conversations).
+
+Thought about storing everything in cohort by vehicle but it's messy. Better to have a dedicated **RuleTarget table** that materializes which vehicles participated in each cohort run.
+
+### Can a vehicle have more than one user?
+
+**Assumption for this challenge:** No (one `Vehicle` belongs to one `Customer`). In the real world, it'd be an **N:M** relationship with `CustomerVehicle` and `primaryContact`.
 
 ---
 
-## 2) Lecturas clave que deben ser eficientes (performance)
+## 2) Key Queries That Need to Be Efficient
 
-1. **Preview de cohorte (quién es elegible hoy para una regla):**
-   - Por `serviceType` + “último servicio” ≥ `cadenceMonths`
-   - Sin **cita próxima**
-2. **Mandar / schedule:** igual que preview pero materializando el cohort (crea `RuleRun` + `RuleTarget`) y queue emails.
-3. **Console/Dashboard:**
-   - Not sure what to show here yet
+1. **Cohort preview (who's eligible today for a rule):**
+   - By `serviceType` + "last service" ≥ `cadenceMonths`
+   - No upcoming appointment
+
+2. **Send/schedule:** Same as preview but materializing the cohort (creates `RuleRun` + `RuleTarget`) and queues emails
+
+3. **Dashboard:**
+   - Campaign stats
+   - Email delivery status
+
 4. **Conversations/Bookings:**
-   - Últimos **emails/replies por customer**
-   - Próximas **appointments**
+   - Recent emails/replies per customer
+   - Upcoming appointments
 
 ---
 
-## 3) Versión de modelo elegida (para el take‑home)
+## 3) Model Version I Chose
 
-- **Version 2 – Vehicle‑Céntrica** (Customer 1:N Vehicle; `ServiceHistory`, `Appointment`, `RuleTarget` pasan por `Vehicle`).
-- Razones:
-  - Las reglas de re‑engagement se evalúan naturalmente **por vehículo**.
-  - La **Consulta 1** (elegibilidad: “no service X desde N meses y sin appointment futuro”) tiene que pasar si o si por vehicle asi que no me cambia mucho.
-  - En emails guardo `customerId` + `vehicleId` para que **conversations/dashboard** puedan resolverse sin joins pesados.
+**Version 2 – Vehicle-Centric** (Customer 1:N Vehicle; `ServiceHistory`, `Appointment`, `RuleTarget` all go through `Vehicle`)
 
-All schema versions considered in [database diagram](./docs/rally.database.png).
+Why:
+- Re-engagement rules are naturally evaluated **per vehicle**
+- The eligibility query ("no service X in N months and no future appointment") has to go through vehicle anyway, so doesn't change much
+- In emails I store `customerId` + `vehicleId` so conversations/dashboard can resolve without heavy joins
 
----
-
-email simulation
-why use workers?
-use workers for emails so we don't block the main thread and simulates the sending of the email realictisc
-add time between updates to simulates time
-
-i first get all campaings and then only pulling for the ones that are not completed. hago pulling ahora por la simulacion, pero usaria https://resend.com/. update: al final tengo que traer siempre todas por si una scheduleada se corre.
-
---- for scheduler, i'm just goint to build it here native so I don't use a external service, that implies checking once by minute if there are schedulers to run.
-
-TODO: remove worker, overkill !
-
---- emails
-adding thread so I can group them by campaign. is Reply so I can show them as conversation in the UI, quick way to do it.
+All schema versions I considered are in the [database diagram](./docs/rally.database.png).
 
 ---
 
-cosas q no funcionan: despues de que se inicia el proceso scheduleado no se actualiza en real time
+## 4) Email Simulation & Workers
 
---- mostrar template !!!
+### Why use workers?
 
-cuando crei que estaba terminando me di cuenta que era recurring, no schdule, so I need to change the architecture to handle that.
+To not block the main thread and simulate realistic email sending. Added time delays between updates to simulate real time.
 
---- database: RecurringSchedule table
+### Polling strategy
 
-**Decisión:** Nueva tabla `RecurringSchedule` separada de `ScheduledCampaign`.
+I first get all campaigns and then only poll for the ones that aren't completed. Doing polling now because of the simulation, but in production I'd use something like [Resend](https://resend.com/).
 
-¿Por qué no reusar ScheduledCampaign?
+**Update:** Actually I have to fetch all campaigns always in case a scheduled one kicks off.
 
-- ScheduledCampaign es para **one-off** campaigns (schedule once, run once).
-- RecurringSchedule es un **template/config** que genera múltiples ScheduledCampaigns.
-- Separar las concerns: RecurringSchedule tiene `frequency`, `timeOfDay`, `dayOfWeek/Month`, etc. ScheduledCampaign solo tiene `scheduledFor`.
+### Email threading
 
-**La relación:**
+Adding `threadId` so I can group emails by campaign. It's like Reply-To, quick way to show them as conversations in the UI.
 
-- `RecurringSchedule` 1:N `ScheduledCampaign` (un recurring crea muchos scheduled).
-- Cada vez que el scheduler corre, crea un nuevo `ScheduledCampaign` con `recurringScheduleId` reference.
-- Así puedo ver **historial completo** de ejecuciones (cada ScheduledCampaign es un run).
+---
 
-**Alternative considerada:** Un campo `isRecurring` boolean en ScheduledCampaign con JSON config. Descarté porque es messy, hard to query, y mezcla dos conceptos diferentes.
+## 5) Scheduling
 
---- polling para recurring schedules
+Built the scheduler natively here so I don't need an external service. That means checking once per minute if there are schedulers to run.
 
-usando el mismo pattern que CampaignsDashboard: polling cada 2 segundos con server actions. super simple, no optimizations (no websockets, no server-sent events, no nada fancy).
+### Oh shit moment: recurring vs scheduled
 
-- ¿Por qué cada 2 segundos? Para que se vea en real-time cuando cambia nextScheduledFor, lastExecutedAt, etc.
-- **Trade-off:** hace más requests pero mantiene todo simple. Para un take-home está perfecto.
-- **Real world:** usaría optimistic updates + revalidateTag o websockets si fuera mucho tráfico. Pero para un dashboard de campaigns admin, polling está bien (no hay cientos de usuarios mirando al mismo tiempo).
-- Mantiene consistencia con el resto de la app (CampaignsDashboard ya hace lo mismo).
+When I thought I was almost done, I realized the requirement was **recurring**, just **scheduled**. Had to change the architecture but decided to build it above what I already had done, so it wasn't that bad.
+
+### Database: RecurringSchedule table
+
+**Decision:** New `RecurringSchedule` table, separate from `ScheduledCampaign`.
+
+**Why not reuse ScheduledCampaign?**
+- ScheduledCampaign is for **one-off** campaigns (schedule once, run once)
+- RecurringSchedule is a **template/config** that generates multiple ScheduledCampaigns
+- Separating concerns: RecurringSchedule has `frequency`, `timeOfDay`, `dayOfWeek/Month`, etc. ScheduledCampaign just has `scheduledFor`
+
+**The relationship:**
+- `RecurringSchedule` 1:N `ScheduledCampaign` (one recurring creates many scheduled)
+- Each time the scheduler runs, it creates a new `ScheduledCampaign` with `recurringScheduleId` reference
+- This way I can see **complete history** of executions (each ScheduledCampaign is a run)
+
+**Alternative I considered:** An `isRecurring` boolean field in ScheduledCampaign with JSON config. Rejected because it's messy, hard to query, and mixes two different concepts.
+
+---
+
+## 6) Real-Time Updates / Polling
+
+### Polling for recurring schedules
+
+Using the same pattern as CampaignsDashboard: polling every 2 seconds with server actions. Super simple, no optimizations (no websockets, no server-sent events, nothing fancy).
+
+**Why every 2 seconds?** So it feels real-time when `nextScheduledFor`, `lastExecutedAt`, etc. change.
+
+**Trade-off:** Makes more requests but keeps everything simple. For a take-home it's ok.
+
+**Real world:** I'd use optimistic updates + revalidateTag or websockets if there was a lot of traffic. But for an admin campaigns dashboard, polling is fine, not hundreds of users watching at the same time.
+
+Keeps consistency with the rest of the app (CampaignsDashboard already does the same).
+
+---
+
+## Things That Don't Work Perfectly
+
+- The dates are all messed up. I spent a little time trying to figure it out but I decided to just keep going.

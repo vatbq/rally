@@ -7,9 +7,9 @@ export interface RecurringScheduleWithRule extends RecurringSchedule {
 export interface CreateRecurringScheduleInput {
   ruleId: string;
   frequency: RecurringFrequency;
-  timeOfDay: string; 
-  dayOfWeek?: number; 
-  dayOfMonth?: number; 
+  timeOfDay: string;
+  dayOfWeek?: number;
+  dayOfMonth?: number;
   timezone: string;
   startsAt: Date;
   endsAt?: Date;

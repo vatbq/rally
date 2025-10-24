@@ -16,9 +16,7 @@ import {
   stopRecurringSchedule,
   getRecurringSchedules,
 } from "@/server/services/recurring-schedules";
-import {
-  CreateRecurringScheduleInput,
-} from "@/server/interfaces/recurring-schedules";
+import { CreateRecurringScheduleInput } from "@/server/interfaces/recurring-schedules";
 import { revalidatePath } from "next/cache";
 
 export const sendEmailCampaignAction = async (ruleId: string) => {

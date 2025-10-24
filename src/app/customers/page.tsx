@@ -1,12 +1,14 @@
 import { Suspense } from "react";
 import CustomersDashboard from "../_components/customers/CustomersDashboard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ImportDataDialog } from "../_components/customers/ImportDataDialog";
 
 const CustomersPage = async () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Customers</h1>
+        <ImportDataDialog />
       </div>
       <Suspense fallback={<CustomersDashboardSkeleton />}>
         <CustomersDashboard />

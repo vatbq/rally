@@ -5,7 +5,6 @@ import {
 } from "@/server/interfaces/recurring-schedules";
 import { RecurringFrequency, ScheduledCampaignStatus } from "@prisma/client";
 
-
 export const calculateNextExecution = (
   frequency: RecurringFrequency,
   timeOfDay: string,

@@ -82,18 +82,20 @@ cosas q no funcionan: despues de que se inicia el proceso scheduleado no se actu
 
 --- mostrar template !!!
 
-cuando crei que estaba terminando me di cuenta que era recurring, no schdule, so I need to change the architecture to handle that. 
+cuando crei que estaba terminando me di cuenta que era recurring, no schdule, so I need to change the architecture to handle that.
 
 --- database: RecurringSchedule table
 
 **Decisión:** Nueva tabla `RecurringSchedule` separada de `ScheduledCampaign`.
 
 ¿Por qué no reusar ScheduledCampaign?
+
 - ScheduledCampaign es para **one-off** campaigns (schedule once, run once).
 - RecurringSchedule es un **template/config** que genera múltiples ScheduledCampaigns.
 - Separar las concerns: RecurringSchedule tiene `frequency`, `timeOfDay`, `dayOfWeek/Month`, etc. ScheduledCampaign solo tiene `scheduledFor`.
 
 **La relación:**
+
 - `RecurringSchedule` 1:N `ScheduledCampaign` (un recurring crea muchos scheduled).
 - Cada vez que el scheduler corre, crea un nuevo `ScheduledCampaign` con `recurringScheduleId` reference.
 - Así puedo ver **historial completo** de ejecuciones (cada ScheduledCampaign es un run).
@@ -108,4 +110,3 @@ usando el mismo pattern que CampaignsDashboard: polling cada 2 segundos con serv
 - **Trade-off:** hace más requests pero mantiene todo simple. Para un take-home está perfecto.
 - **Real world:** usaría optimistic updates + revalidateTag o websockets si fuera mucho tráfico. Pero para un dashboard de campaigns admin, polling está bien (no hay cientos de usuarios mirando al mismo tiempo).
 - Mantiene consistencia con el resto de la app (CampaignsDashboard ya hace lo mismo).
-

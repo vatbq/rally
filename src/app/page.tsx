@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { DashboardStats } from "@/app/_components/dashboard/DashboardStats";
 import { UpcomingAppointments } from "@/app/_components/dashboard/UpcomingAppointments";
 import { RecentCampaigns } from "@/app/_components/dashboard/RecentCampaigns";
+import { ImportDataDialog } from "@/app/_components/customers/ImportDataDialog";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -10,18 +11,9 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 export default function HomePage() {
   return (
     <div className="flex flex-col space-y-8">
-      <h1 className="text-4xl font-bold mb-4">Welcome to Rally!</h1>
-
-      <div className="flex gap-4 flex-wrap">
-        <Link href="/rules/new">
-          <Button>Create New Rule</Button>
-        </Link>
-        <Link href="/campaigns">
-          <Button variant="outline">View Campaigns</Button>
-        </Link>
-        <Link href="/rules">
-          <Button variant="outline">View Rules</Button>
-        </Link>
+      <div className="flex justify-between items-center">
+        <h1 className="text-4xl font-bold">Welcome to Rally!</h1>
+        <ImportDataDialog />
       </div>
 
       <Suspense fallback={<StatsSkeletons />}>

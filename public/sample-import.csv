@@ -1,0 +1,12 @@
+customer_email,customer_first_name,customer_last_name,customer_phone,vehicle_vin,vehicle_plate,vehicle_make,vehicle_model,vehicle_year,service_type,service_performed_at,service_notes
+john.smith@example.com,John,Smith,+1-555-0101,1HGCM82633A123456,ABC1234,Honda,Accord,2019,OIL_CHANGE,2024-07-24,Synthetic oil, new filter
+john.smith@example.com,John,Smith,+1-555-0101,1HGCM82633A123456,ABC1234,Honda,Accord,2019,TIRE_ROTATION,2024-04-24,All tires rotated, pressure checked
+john.smith@example.com,John,Smith,+1-555-0101,5FNRL5H40BB123456,XYZ5678,Toyota,Camry,2021,ROUTINE_MAINTENANCE,2024-07-24,30,000 mile service - oil change, tire rotation, inspections
+sarah.johnson@example.com,Sarah,Johnson,+1-555-0102,1FMCU0G64JUA12345,DEF9012,Ford,F-150,2020,BRAKE_INSPECTION,2023-10-24,Brake pads at 40%, rotors good
+sarah.johnson@example.com,Sarah,Johnson,+1-555-0102,1FMCU0G64JUA12345,DEF9012,Ford,F-150,2020,OIL_CHANGE,2024-04-24,Conventional oil, new filter
+mike.davis@example.com,Mike,Davis,+1-555-0103,2T1BURHE5GC123456,GHI3456,Tesla,Model 3,2022,,,
+emily.brown@example.com,Emily,Brown,+1-555-0104,3VWDX7AJ8DM123456,JKL7890,Volkswagen,Jetta,2018,OIL_CHANGE,2024-05-15,Synthetic oil, air filter replaced
+emily.brown@example.com,Emily,Brown,+1-555-0104,3VWDX7AJ8DM123456,JKL7890,Volkswagen,Jetta,2018,ROUTINE_MAINTENANCE,2023-11-10,60,000 mile service
+david.wilson@example.com,David,Wilson,+1-555-0105,1G1ZD5ST4LF123456,MNO4567,Chevrolet,Malibu,2019,TIRE_ROTATION,2024-06-20,Tires rotated and balanced
+david.wilson@example.com,David,Wilson,+1-555-0105,1G1ZD5ST4LF123456,MNO4567,Chevrolet,Malibu,2019,BATTERY_CHECK,2024-03-12,Battery tested - 85% capacity
+
